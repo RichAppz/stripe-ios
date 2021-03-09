@@ -10,10 +10,6 @@ import Foundation
 import PassKit
 import SafariServices
 
-#if canImport(Stripe3DS2)
-import Stripe3DS2
-#endif
-
 /// `STPPaymentHandlerActionStatus` represents the possible outcomes of requesting an action by `STPPaymentHandler`. An action could be confirming and/or handling the next action for a PaymentIntent.
 @objc public enum STPPaymentHandlerActionStatus: Int {
   /// The action succeeded.
@@ -41,10 +37,6 @@ import Stripe3DS2
   /// The action timed out.
   @objc(STPPaymentHandlerTimedOutErrorCode)
   case timedOutErrorCode
-
-  /// There was an error in the Stripe3DS2 SDK.
-  @objc(STPPaymentHandlerStripe3DS2ErrorCode)
-  case stripe3DS2ErrorCode
 
   /// The transaction did not authenticate (e.g. user entered the wrong code).
   @objc(STPPaymentHandlerNotAuthenticatedErrorCode)
@@ -106,17 +98,11 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
   /// `STPPaymentHandler` should not be directly initialized.
   private override init() {
     self.apiClient = STPAPIClient.shared
-    self.threeDSCustomizationSettings = STPThreeDSCustomizationSettings()
     super.init()
   }
 
   /// By default `sharedHandler` initializes with STPAPIClient.shared.
   @objc public var apiClient: STPAPIClient
-
-  /// Customizable settings to use when performing 3DS2 authentication.
-  /// Note: Configure this before calling any methods.
-  /// Defaults to `STPThreeDSCustomizationSettings.defaultSettings()`.
-  @objc public var threeDSCustomizationSettings: STPThreeDSCustomizationSettings
 
   /// Confirms the PaymentIntent with the provided parameters and handles any `nextAction` required
   /// to authenticate the PaymentIntent.
@@ -370,7 +356,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
         let action = STPPaymentHandlerSetupIntentActionParams(
           apiClient: self.apiClient,
           authenticationContext: authenticationContext,
-          threeDSCustomizationSettings: self.threeDSCustomizationSettings,
           setupIntent: setupIntent,
           returnURL: setupIntentConfirmParams.returnURL
         ) { status, resultSetupIntent, resultError in
@@ -544,7 +529,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     let action = STPPaymentHandlerPaymentIntentActionParams(
       apiClient: apiClient,
       authenticationContext: authenticationContext,
-      threeDSCustomizationSettings: threeDSCustomizationSettings,
       paymentIntent: paymentIntent,
       returnURL: returnURLString
     ) { status, resultPaymentIntent, error in
@@ -577,7 +561,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     let action = STPPaymentHandlerSetupIntentActionParams(
       apiClient: apiClient,
       authenticationContext: authenticationContext,
-      threeDSCustomizationSettings: threeDSCustomizationSettings,
       setupIntent: setupIntent,
       returnURL: returnURLString
     ) { status, resultSetupIntent, resultError in
@@ -814,160 +797,9 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
               ]))
 
         case .threeDS2Fingerprint:
-          guard let threeDSService = currentAction.threeDS2Service else {
-            currentAction.complete(
-              with: STPPaymentHandlerActionStatus.failed,
-              error: _error(
-                for: .stripe3DS2ErrorCode,
-                userInfo: [
-                  "description": "Failed to initialize STDSThreeDS2Service."
-                ]))
-            return
-          }
-          var transaction: STDSTransaction?
-          var authRequestParams: STDSAuthenticationRequestParameters?
-
-          STDSSwiftTryCatch.try(
-            {
-              transaction = threeDSService.createTransaction(
-                forDirectoryServer: useStripeSDK.directoryServerID ?? "",
-                serverKeyID: useStripeSDK.directoryServerKeyID,
-                certificateString: useStripeSDK.directoryServerCertificate ?? "",
-                rootCertificateStrings: useStripeSDK.rootCertificateStrings ?? [],
-                withProtocolVersion: "2.1.0")
-
-              authRequestParams = transaction?.createAuthenticationRequestParameters()
-
-            },
-            catch: { exception in
-              currentAction.complete(
-                with: STPPaymentHandlerActionStatus.failed,
-                error: self._error(
-                  for: .stripe3DS2ErrorCode,
-                  userInfo: [
-                    "exception": exception.description
-                  ]))
-            },
-            finallyBlock: {
-            })
-
-          STPAnalyticsClient.sharedClient.log3DS2AuthenticateAttempt(
-            with: currentAction.apiClient.configuration,
-            intentID: currentAction.intentStripeID ?? "")
-
-          if let authParams = authRequestParams,
-            let transaction = transaction
-          {
-            currentAction.apiClient.authenticate3DS2(
-              authParams,
-              sourceIdentifier: useStripeSDK.threeDSSourceID ?? "",
-              returnURL: currentAction.returnURLString,
-              maxTimeout: currentAction.threeDSCustomizationSettings.authenticationTimeout
-            ) { (authenticateResponse, error) in
-              if let authenticateResponse = authenticateResponse,
-                error == nil
-              {
-
-                if let aRes = authenticateResponse.authenticationResponse {
-
-                  if aRes.isChallengeRequired {
-                    let challengeParameters = STDSChallengeParameters(authenticationResponse: aRes)
-
-                    let doChallenge: STPVoidBlock = {
-                      var presentationError: NSError?
-
-                      if !self._canPresent(
-                        with: currentAction.authenticationContext, error: &presentationError)
-                      {
-                        currentAction.complete(
-                          with: STPPaymentHandlerActionStatus.failed, error: presentationError)
-                      } else {
-                        STDSSwiftTryCatch.try(
-                          {
-                            transaction.doChallenge(
-                              with: currentAction.authenticationContext
-                                .authenticationPresentingViewController(),
-                              challengeParameters: challengeParameters,
-                              challengeStatusReceiver: self,
-                              timeout: TimeInterval(
-                                currentAction.threeDSCustomizationSettings.authenticationTimeout
-                                  * 60))
-
-                          },
-                          catch: { exception in
-                            self.currentAction?.complete(
-                              with: STPPaymentHandlerActionStatus.failed,
-                              error: self._error(
-                                for: .stripe3DS2ErrorCode,
-                                userInfo: [
-                                  "exception": exception
-                                ]))
-                          },
-                          finallyBlock: {
-                          })
-                      }
-                    }
-
-                    if currentAction.authenticationContext.responds(
-                      to: #selector(STPAuthenticationContext.prepare(forPresentation:)))
-                    {
-                      currentAction.authenticationContext.prepare?(forPresentation: doChallenge)
-                    } else {
-                      doChallenge()
-                    }
-
-                  } else {
-                    // Challenge not required, finish the flow.
-                    transaction.close()
-                    STPAnalyticsClient.sharedClient.log3DS2FrictionlessFlow(
-                      with: currentAction.apiClient.configuration,
-                      intentID: currentAction.intentStripeID ?? "")
-
-                    self._retrieveAndCheckIntentForCurrentAction()
-                  }
-
-                } else if let fallbackURL = authenticateResponse.fallbackURL {
-                  self._handleRedirect(
-                    to: fallbackURL, withReturn: URL(string: currentAction.returnURLString ?? ""))
-                } else {
-                  currentAction.complete(
-                    with: STPPaymentHandlerActionStatus.failed,
-                    error: self._error(
-                      for: .unsupportedAuthenticationErrorCode,
-                      userInfo: [
-                        "STPIntentAction": authenticationAction.description
-                      ]))
-                }
-
-              } else {
-                currentAction.complete(
-                  with: STPPaymentHandlerActionStatus.failed, error: (error as NSError?))
-              }
-            }
-
-          } else {
-            currentAction.complete(
-              with: STPPaymentHandlerActionStatus.failed,
-              error: self._error(
-                for: .unsupportedAuthenticationErrorCode,
-                userInfo: [
-                  "STPIntentAction": authenticationAction.description
-                ]))
-          }
-
+            break
         case .threeDS2Redirect:
-          if let redirectURL = useStripeSDK.redirectURL {
-            let returnURL: URL?
-            if let returnURLString = currentAction.returnURLString {
-              returnURL = URL(string: returnURLString)
-            } else {
-              returnURL = nil
-            }
-            _handleRedirect(to: redirectURL, withReturn: returnURL)
-          } else {
-            // TOOD : Error
-          }
-
+            break
         @unknown default:
           fatalError()
         }
@@ -1295,45 +1127,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
   }
 
   func _markChallengeCompleted(withCompletion completion: @escaping STPBooleanSuccessBlock) {
-    guard let currentAction = currentAction,
-      let threeDSSourceID = currentAction.nextAction()?.useStripeSDK?.threeDSSourceID
-    else {
-      completion(false, nil)
-      return
-    }
-
-    currentAction.apiClient.complete3DS2Authentication(forSource: threeDSSourceID) {
-      success, error in
-      if success {
-        if let paymentIntentAction = currentAction as? STPPaymentHandlerPaymentIntentActionParams,
-          let paymentIntent = paymentIntentAction.paymentIntent
-        {
-
-          currentAction.apiClient.retrievePaymentIntent(
-            withClientSecret: paymentIntent.clientSecret,
-            expand: ["payment_method"]
-          ) { retrievedPaymentIntent, retrieveError in
-            paymentIntentAction.paymentIntent = retrievedPaymentIntent
-            completion(retrievedPaymentIntent != nil, retrieveError)
-          }
-        } else if let setupIntentAction = currentAction
-          as? STPPaymentHandlerSetupIntentActionParams,
-          let setupIntent = setupIntentAction.setupIntent
-        {
-          currentAction.apiClient.retrieveSetupIntent(
-            withClientSecret: setupIntent.clientSecret
-          ) { retrievedSetupIntent, retrieveError in
-            setupIntentAction.setupIntent = retrievedSetupIntent
-            completion(retrievedSetupIntent != nil, retrieveError)
-          }
-        } else {
-          assert(false, "currentAction is an unknown type or nil intent.")
-        }
-      } else {
-        completion(success, error)
-      }
-    }
-
+    completion(false, nil)
   }
 
   // MARK: - Errors
@@ -1382,12 +1176,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     case .requiresAuthenticationContextErrorCode:
       userInfo[NSLocalizedDescriptionKey] = NSError.stp_unexpectedErrorMessage()
 
-    // Exceptions thrown from the Stripe3DS2 SDK. Other errors are reported via STPChallengeStatusReceiver.
-    case .stripe3DS2ErrorCode:
-      userInfo[STPError.errorMessageKey] =
-        userInfo[STPError.errorMessageKey] ?? "There was an error in the Stripe3DS2 SDK."
-      userInfo[NSLocalizedDescriptionKey] = NSError.stp_unexpectedErrorMessage()
-
     // Confirmation errors (eg card was declined)
     case .paymentErrorCode:
       userInfo[STPError.errorMessageKey] =
@@ -1407,159 +1195,5 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     return NSError(
       domain: STPPaymentHandler.errorDomain, code: errorCode.rawValue,
       userInfo: userInfo as? [String: Any])
-  }
-}
-
-@available(iOSApplicationExtension, unavailable)
-@available(macCatalystApplicationExtension, unavailable)
-private extension STPPaymentHandler {
-  // MARK: - STPChallengeStatusReceiver
-  /// :nodoc:
-  @objc(transaction:didCompleteChallengeWithCompletionEvent:)
-  dynamic func transaction(
-    _ transaction: STDSTransaction, didCompleteChallengeWith completionEvent: STDSCompletionEvent
-  ) {
-    guard let currentAction = currentAction else {
-      assert(false, "Calling didCompleteChallengeWith without currentAction.")
-      return
-    }
-    let transactionStatus = completionEvent.transactionStatus
-    STPAnalyticsClient.sharedClient.log3DS2ChallengeFlowCompleted(
-      with: currentAction.apiClient.configuration,
-      intentID: currentAction.intentStripeID ?? "",
-      uiType: transaction.presentedChallengeUIType)
-    if transactionStatus == "Y" {
-      _markChallengeCompleted(withCompletion: { markedCompleted, error in
-        currentAction.complete(
-          with: markedCompleted ? .succeeded : .failed, error: error as NSError?)
-      })
-    } else {
-      // going to ignore the rest of the status types because they provide more detail than we require
-      _markChallengeCompleted(withCompletion: { _, error in
-        currentAction.complete(
-          with: STPPaymentHandlerActionStatus.failed,
-          error: self._error(
-            for: .notAuthenticatedErrorCode,
-            userInfo: [
-              "transaction_status": transactionStatus
-            ]))
-      })
-    }
-  }
-
-  /// :nodoc:
-  @objc(transactionDidCancel:)
-  dynamic func transactionDidCancel(_ transaction: STDSTransaction) {
-    guard let currentAction = currentAction else {
-      assert(false, "Calling transactionDidCancel without currentAction.")
-      return
-    }
-
-    STPAnalyticsClient.sharedClient.log3DS2ChallengeFlowUserCanceled(
-      with: currentAction.apiClient.configuration,
-      intentID: currentAction.intentStripeID ?? "",
-      uiType: transaction.presentedChallengeUIType)
-    _markChallengeCompleted(withCompletion: { _, error in
-      // we don't forward cancelation errors
-      currentAction.complete(with: STPPaymentHandlerActionStatus.canceled, error: nil)
-    })
-  }
-
-  /// :nodoc:
-  @objc(transactionDidTimeOut:)
-  dynamic func transactionDidTimeOut(_ transaction: STDSTransaction) {
-    guard let currentAction = currentAction else {
-      assert(false, "Calling transactionDidTimeOut without currentAction.")
-      return
-    }
-
-    STPAnalyticsClient.sharedClient.log3DS2ChallengeFlowTimedOut(
-      with: currentAction.apiClient.configuration,
-      intentID: currentAction.intentStripeID ?? "",
-      uiType: transaction.presentedChallengeUIType)
-    _markChallengeCompleted(withCompletion: { _, error in
-      currentAction.complete(
-        with: STPPaymentHandlerActionStatus.failed,
-        error: self._error(for: .timedOutErrorCode, userInfo: nil))
-    })
-
-  }
-
-  /// :nodoc:
-  @objc(transaction:didErrorWithProtocolErrorEvent:)
-  dynamic func transaction(
-    _ transaction: STDSTransaction, didErrorWith protocolErrorEvent: STDSProtocolErrorEvent
-  ) {
-
-    guard let currentAction = currentAction else {
-      assert(false, "Calling didErrorWith protocolErrorEvent without currentAction.")
-      return
-    }
-
-    _markChallengeCompleted(withCompletion: { _, error in
-      // Add localizedError to the 3DS2 SDK error
-      let threeDSError = protocolErrorEvent.errorMessage.nsErrorValue() as NSError
-      var userInfo = threeDSError.userInfo
-      userInfo[NSLocalizedDescriptionKey] = NSError.stp_unexpectedErrorMessage()
-
-      let localizedError = NSError(
-        domain: threeDSError.domain, code: threeDSError.code, userInfo: userInfo)
-      STPAnalyticsClient.sharedClient.log3DS2ChallengeFlowErrored(
-        with: currentAction.apiClient.configuration,
-        intentID: currentAction.intentStripeID ?? "",
-        errorDictionary: [
-          "domain": threeDSError.domain,
-          "code": NSNumber(value: threeDSError.code),
-          "user_info": userInfo,
-        ])
-      currentAction.complete(with: STPPaymentHandlerActionStatus.failed, error: localizedError)
-    })
-  }
-
-  /// :nodoc:
-  @objc(transaction:didErrorWithRuntimeErrorEvent:)
-  dynamic func transaction(
-    _ transaction: STDSTransaction, didErrorWith runtimeErrorEvent: STDSRuntimeErrorEvent
-  ) {
-
-    guard let currentAction = currentAction else {
-      assert(false, "Calling didErrorWith runtimeErrorEvent without currentAction.")
-      return
-    }
-
-    _markChallengeCompleted(withCompletion: { _, error in
-      // Add localizedError to the 3DS2 SDK error
-      let threeDSError = runtimeErrorEvent.nsErrorValue() as NSError
-      var userInfo = threeDSError.userInfo
-      userInfo[NSLocalizedDescriptionKey] = NSError.stp_unexpectedErrorMessage()
-
-      let localizedError = NSError(
-        domain: threeDSError.domain, code: threeDSError.code, userInfo: userInfo)
-
-      STPAnalyticsClient.sharedClient.log3DS2ChallengeFlowErrored(
-        with: currentAction.apiClient.configuration,
-        intentID: currentAction.intentStripeID ?? "",
-        errorDictionary: [
-          "domain": threeDSError.domain,
-          "code": NSNumber(value: threeDSError.code),
-          "user_info": userInfo,
-        ])
-      currentAction.complete(with: STPPaymentHandlerActionStatus.failed, error: localizedError)
-    })
-  }
-
-  /// :nodoc:
-  @objc(transactionDidPresentChallengeScreen:)
-  dynamic func transactionDidPresentChallengeScreen(_ transaction: STDSTransaction) {
-
-    guard let currentAction = currentAction else {
-      assert(false, "Calling didErrorWith runtimeErrorEvent without currentAction.")
-      return
-    }
-
-    STPAnalyticsClient.sharedClient.log3DS2ChallengeFlowPresented(
-      with: currentAction.apiClient.configuration,
-      intentID: currentAction.intentStripeID ?? "",
-      uiType: transaction.presentedChallengeUIType)
   }
 }

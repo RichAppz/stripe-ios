@@ -17,15 +17,6 @@ import UIKit
 /// }
 /// ```
 @objc public class STPApplePayPaymentOption: NSObject, STPPaymentOption {
-  // MARK: - STPPaymentOption
-  @objc public var image: UIImage {
-    return STPImageLibrary.applePayCardImage()
-  }
-
-  @objc public var templateImage: UIImage {
-    // No template for Apple Pay
-    return STPImageLibrary.applePayCardImage()
-  }
 
   @objc public var label: String {
     return STPLocalizedString("Apple Pay", "Text for Apple Pay payment method")

@@ -284,15 +284,6 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption, STPSo
     return card
   }
 
-  // MARK: - STPPaymentOption
-  @objc public var image: UIImage {
-    return STPImageLibrary.cardBrandImage(for: brand)
-  }
-
-  @objc public var templateImage: UIImage {
-    return STPImageLibrary.templatedBrandImage(for: brand)
-  }
-
   @objc public var label: String {
     let brand = STPCard.string(from: self.brand)
     return "\(brand) \(last4 )"

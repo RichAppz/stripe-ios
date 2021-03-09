@@ -243,23 +243,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
     return paymentMethod
   }
 
-  // MARK: - STPPaymentOption
-  @objc public var image: UIImage {
-    if type == .card, let card = card {
-      return STPImageLibrary.cardBrandImage(for: card.brand)
-    } else {
-      return STPImageLibrary.cardBrandImage(for: .unknown)
-    }
-  }
-
-  @objc public var templateImage: UIImage {
-    if type == .card, let card = card {
-      return STPImageLibrary.templatedBrandImage(for: card.brand)
-    } else {
-      return STPImageLibrary.templatedBrandImage(for: .unknown)
-    }
-  }
-
   @objc public var label: String {
     switch type {
     case .alipay:

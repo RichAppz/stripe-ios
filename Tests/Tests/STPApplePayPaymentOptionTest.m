@@ -18,16 +18,6 @@
 
 #pragma mark - STPPaymentOption Tests
 
-- (void)testImage {
-    STPApplePayPaymentOption *applePay = [[STPApplePayPaymentOption alloc] init];
-    XCTAssert([applePay image]);
-}
-
-- (void)testTemplateImage {
-    STPApplePayPaymentOption *applePay = [[STPApplePayPaymentOption alloc] init];
-    XCTAssert([applePay templateImage]);
-}
-
 - (void)testLabel {
     STPApplePayPaymentOption *applePay = [[STPApplePayPaymentOption alloc] init];
     XCTAssertEqualObjects([applePay label], @"Apple Pay");

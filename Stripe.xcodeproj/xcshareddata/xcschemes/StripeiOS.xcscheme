@@ -59,6 +59,27 @@
                <Test
                   Identifier = "STPSourceFunctionalTest/testCreateSource_wechatPay">
                </Test>
+               <Test
+                  Identifier = "STPThreeDSButtonCustomizationTest">
+               </Test>
+               <Test
+                  Identifier = "STPThreeDSFooterCustomizationTest">
+               </Test>
+               <Test
+                  Identifier = "STPThreeDSLabelCustomizationTest">
+               </Test>
+               <Test
+                  Identifier = "STPThreeDSNavigationBarCustomizationTest">
+               </Test>
+               <Test
+                  Identifier = "STPThreeDSSelectionCustomizationTest">
+               </Test>
+               <Test
+                  Identifier = "STPThreeDSTextFieldCustomizationTest">
+               </Test>
+               <Test
+                  Identifier = "STPThreeDSUICustomizationTest">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>

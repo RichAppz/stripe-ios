@@ -490,36 +490,6 @@
              [STPTestUtils jsonNamed:STPTestJSONSourceSofort]];
 }
 
-- (void)testPaymentOptionImage {
-    for (NSDictionary *response in [self possibleAPIResponses]) {
-        STPSource *source = [STPSource decodedObjectFromAPIResponse:response];
-
-        switch (source.type) {
-            case STPSourceTypeCard:
-                STPAssertEqualImages(source.image, [STPImageLibrary brandImageForCardBrand:source.cardDetails.brand]);
-                break;
-            default:
-                STPAssertEqualImages(source.image, [STPImageLibrary brandImageForCardBrand:STPCardBrandUnknown]);
-                break;
-        }
-    }
-}
-
-- (void)testPaymentOptionTemplateImage {
-    for (NSDictionary *response in [self possibleAPIResponses]) {
-        STPSource *source = [STPSource decodedObjectFromAPIResponse:response];
-
-        switch (source.type) {
-            case STPSourceTypeCard:
-                STPAssertEqualImages(source.templateImage, [STPImageLibrary templatedBrandImageForCardBrand:source.cardDetails.brand]);
-                break;
-            default:
-                STPAssertEqualImages(source.templateImage, [STPImageLibrary templatedBrandImageForCardBrand:STPCardBrandUnknown]);
-                break;
-        }
-    }
-}
-
 - (void)testPaymentOptionLabel {
     for (NSDictionary *response in [self possibleAPIResponses]) {
         STPSource *source = [STPSource decodedObjectFromAPIResponse:response];

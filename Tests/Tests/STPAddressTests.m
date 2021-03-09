@@ -332,40 +332,6 @@
     XCTAssertFalse([address containsContentForBillingAddressFields:STPBillingAddressFieldsName]);
 }
 
-- (void)testContainsRequiredShippingAddressFields {
-    STPAddress *address = [STPAddress new];
-    XCTAssertTrue([address containsRequiredShippingAddressFields:nil]);
-    NSSet<STPContactField *> *allFields = [NSSet setWithArray:@[STPContactField.postalAddress,
-                                                              STPContactField.emailAddress,
-                                                              STPContactField.phoneNumber,
-                                                              STPContactField.name]];
-    XCTAssertFalse([address containsRequiredShippingAddressFields:allFields]);
-
-    address.name = @"John Smith";
-    XCTAssertTrue(([address containsRequiredShippingAddressFields:[NSSet setWithArray:@[STPContactField.name]]]));
-    XCTAssertFalse(([address containsRequiredShippingAddressFields:[NSSet setWithArray:@[STPContactField.emailAddress]]]));
-
-    address.email = @"john@example.com";
-    XCTAssertTrue(([address containsRequiredShippingAddressFields:[NSSet setWithArray:@[STPContactField.name, STPContactField.emailAddress]]]));
-    XCTAssertFalse(([address containsRequiredShippingAddressFields:allFields]));
-
-    address.phone = @"5555555555";
-    XCTAssertTrue(([address containsRequiredShippingAddressFields:[NSSet setWithArray:@[STPContactField.name, STPContactField.emailAddress, STPContactField.phoneNumber]]]));
-    address.phone = @"555";
-    XCTAssertFalse(([address containsRequiredShippingAddressFields:[NSSet setWithArray:@[STPContactField.name, STPContactField.emailAddress, STPContactField.phoneNumber]]]));
-    XCTAssertFalse(([address containsRequiredShippingAddressFields:allFields]));
-    address.country = @"GB";
-    XCTAssertTrue(([address containsRequiredShippingAddressFields:[NSSet setWithArray:@[STPContactField.name, STPContactField.emailAddress, STPContactField.phoneNumber]]]));
-
-    address.country = @"US";
-    address.phone = @"5555555555";
-    address.line1 = @"55 John St";
-    address.city = @"New York";
-    address.state = @"NY";
-    address.postalCode = @"12345";
-    XCTAssertTrue([address containsRequiredShippingAddressFields:allFields]);
-}
-
 - (void)testContainsContentForShippingAddressFields {
     STPAddress *address = [STPAddress new];
 

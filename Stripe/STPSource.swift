@@ -314,23 +314,6 @@ public class STPSource: NSObject, STPAPIResponseDecodable, STPSourceProtocol, ST
     return source
   }
 
-  // MARK: - STPPaymentOption
-  @objc public var image: UIImage {
-    if type == .card, let cardDetails = cardDetails {
-      return STPImageLibrary.cardBrandImage(for: cardDetails.brand)
-    } else {
-      return STPImageLibrary.cardBrandImage(for: .unknown)
-    }
-  }
-
-  @objc public var templateImage: UIImage {
-    if type == .card, let cardDetails = cardDetails {
-      return STPImageLibrary.templatedBrandImage(for: cardDetails.brand)
-    } else {
-      return STPImageLibrary.templatedBrandImage(for: .unknown)
-    }
-  }
-
   @objc public var label: String {
     switch type {
     case .bancontact:

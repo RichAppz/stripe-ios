@@ -13,6 +13,7 @@ import UIKit
 /// @note To create a PaymentMethod from an Apple Pay PKPaymentToken, see `STPAPIClient createPaymentMethodWithPayment:completion:`
 /// - seealso: https://stripe.com/docs/api/payment_methods/create
 public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOption {
+    
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
 
   /// The type of payment method.  The associated property will contain additional information (e.g. `type == STPPaymentMethodTypeCard` means `card` should also be populated).
@@ -501,27 +502,6 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
       NSStringFromSelector(#selector(getter:afterpayClearpay)): "afterpayClearpay",
       NSStringFromSelector(#selector(getter:metadata)): "metadata",
     ]
-  }
-
-  // MARK: - STPPaymentOption
-  @objc public var image: UIImage {
-    if type == .card && card != nil {
-      let brand = STPCardValidator.brand(forNumber: card?.number ?? "")
-      return STPImageLibrary.cardBrandImage(for: brand)
-    } else {
-      return STPImageLibrary.cardBrandImage(for: .unknown)
-    }
-  }
-
-  @objc public var templateImage: UIImage {
-    if type == .card && card != nil {
-      let brand = STPCardValidator.brand(forNumber: card?.number ?? "")
-      return STPImageLibrary.templatedBrandImage(for: brand)
-    } else if type == .FPX {
-      return STPImageLibrary.bankIcon()
-    } else {
-      return STPImageLibrary.templatedBrandImage(for: .unknown)
-    }
   }
 
   @objc public var label: String {

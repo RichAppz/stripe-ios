@@ -10,10 +10,6 @@ import Foundation
 import PassKit
 import UIKit
 
-#if canImport(Stripe3DS2)
-import Stripe3DS2
-#endif
-
 /// A client for making connections to the Stripe API.
 public class STPAPIClient: NSObject {
   /// The current version of this library.
@@ -300,109 +296,6 @@ extension STPAPIClient {
       createToken(withParameters: params, completion: completion)
     }
     STPTelemetryClient.shared.sendTelemetryData()
-  }
-}
-
-// MARK: Upload
-
-/// STPAPIClient extensions to upload files.
-extension STPAPIClient {
-  func data(
-    forUploadedImage image: UIImage,
-    purpose: STPFilePurpose
-  ) -> Data {
-
-    var maxBytes: Int = 0
-    switch purpose {
-    case .identityDocument:
-      maxBytes = 4 * 1_000_000
-    case .disputeEvidence:
-      maxBytes = 8 * 1_000_000
-    case .unknown:
-      maxBytes = 0
-    default:
-      break
-    }
-    return image.stp_jpegData(withMaxFileSize: maxBytes)
-  }
-
-  /// Uses the Stripe file upload API to upload an image. This can be used for
-  /// identity verification and evidence disputes.
-  /// - Parameters:
-  ///   - image: The image to be uploaded. The maximum allowed file size is 4MB
-  /// for identity documents and 8MB for evidence disputes. Cannot be nil.
-  /// Your image will be automatically resized down if you pass in one that
-  /// is too large
-  ///   - purpose: The purpose of this file. This can be either an identifing
-  /// document or an evidence dispute.
-  ///   - completion: The callback to run with the returned Stripe file
-  /// (and any errors that may have occurred).
-  /// - seealso: https://stripe.com/docs/file-upload
-  @objc
-  public func uploadImage(
-    _ image: UIImage,
-    purpose: STPFilePurpose,
-    completion: STPFileCompletionBlock?
-  ) {
-
-    let purposePart = STPMultipartFormDataPart()
-    purposePart.name = "purpose"
-    if let purposeString = STPFile.string(from: purpose),
-      let purposeData = purposeString.data(using: .utf8)
-    {
-      purposePart.data = purposeData
-    }
-
-    let imagePart = STPMultipartFormDataPart()
-    imagePart.name = "file"
-    imagePart.filename = "image.jpg"
-    imagePart.contentType = "image/jpeg"
-
-    imagePart.data = self.data(
-      forUploadedImage: image,
-      purpose: purpose)
-
-    let boundary = STPMultipartFormDataEncoder.generateBoundary()
-    let data = STPMultipartFormDataEncoder.multipartFormData(
-      for: [purposePart, imagePart], boundary: boundary)
-
-    var request: NSMutableURLRequest?
-    if let url = URL(string: FileUploadURL) {
-      request = configuredRequest(for: url)
-    }
-    request?.httpMethod = "POST"
-    request?.stp_setMultipartForm(data, boundary: boundary)
-
-    if let request = request {
-      urlSession.dataTask(
-        with: request as URLRequest,
-        completionHandler: { body, response, error in
-          var jsonDictionary: [AnyHashable: Any]?
-          if let body = body {
-            jsonDictionary =
-              try? JSONSerialization.jsonObject(with: body, options: []) as? [AnyHashable: Any]
-          }
-          let file = STPFile.decodedObject(fromAPIResponse: jsonDictionary)
-
-          var returnedError = NSError.stp_error(fromStripeResponse: jsonDictionary) ?? error
-          if (file == nil || !(response is HTTPURLResponse)) && returnedError == nil {
-            returnedError = NSError.stp_genericFailedToParseResponseError()
-          }
-
-          if completion == nil {
-            return
-          }
-
-          stpDispatchToMainThreadIfNecessary({
-            if let returnedError = returnedError {
-              completion?(nil, returnedError)
-            } else {
-              completion?(file, nil)
-            }
-          })
-        }
-      ).resume()
-    }
   }
 }
 
@@ -913,60 +806,6 @@ extension STPAPIClient {
       parameters: params as [String: Any]
     ) { deserializer, _, error in
       completion(deserializer?.paymentMethods, error)
-    }
-  }
-}
-
-// MARK: - ThreeDS2
-extension STPAPIClient {
-  /// Kicks off 3DS2 authentication.
-  func authenticate3DS2(
-    _ authRequestParams: STDSAuthenticationRequestParameters,
-    sourceIdentifier sourceID: String,
-    returnURL returnURLString: String?,
-    maxTimeout: Int,
-    completion: @escaping STP3DS2AuthenticateCompletionBlock
-  ) {
-    let endpoint = "\(APIEndpoint3DS2)/authenticate"
-
-    var appParams = STDSJSONEncoder.dictionary(forObject: authRequestParams)
-    appParams["deviceRenderOptions"] = [
-      "sdkInterface": "03",
-      "sdkUiType": ["01", "02", "03", "04", "05"],
-    ]
-    appParams["sdkMaxTimeout"] = String(format: "%02ld", maxTimeout)
-    let appData = try? JSONSerialization.data(withJSONObject: appParams, options: .prettyPrinted)
-
-    var params = [
-      "app": String(data: appData ?? Data(), encoding: .utf8) ?? "",
-      "source": sourceID,
-    ]
-    if let returnURLString = returnURLString {
-      params["fallback_return_url"] = returnURLString
-    }
-
-    APIRequest<STP3DS2AuthenticateResponse>.post(
-      with: self,
-      endpoint: endpoint,
-      parameters: params
-    ) { authenticateResponse, _, error in
-      completion(authenticateResponse, error)
-    }
-  }
-
-  /// Endpoint to call to indicate that the challenge flow for a 3DS2 authentication has finished.
-  func complete3DS2Authentication(
-    forSource sourceID: String, completion: @escaping STPBooleanSuccessBlock
-  ) {
-
-    APIRequest<STPEmptyStripeResponse>.post(
-      with: self,
-      endpoint: "\(APIEndpoint3DS2)/challenge_complete",
-      parameters: [
-        "source": sourceID
-      ]
-    ) { _, response, responseError in
-      completion(response?.statusCode == 200, responseError)
     }
   }
 }

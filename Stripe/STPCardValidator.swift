@@ -14,7 +14,7 @@ import Foundation
   /// The field's contents are valid. For example, a valid, 16-digit card number.
   /// Note that valid values may not be complete. For example: a US Zip code can
   /// be 5 or 9 digits. A 5-digit code is Valid, but more text could be entered
-  /// to transition to incomplete again. American Express CVC codes can be 3 or
+  /// to transition to incomplete a gain. American Express CVC codes can be 3 or
   /// 4 digits and both will be treated as Valid.
   case valid
   /// The field's contents are invalid. For example, an expiration date

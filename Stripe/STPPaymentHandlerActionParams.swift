@@ -8,17 +8,11 @@
 
 import Foundation
 
-#if canImport(Stripe3DS2)
-import Stripe3DS2
-#endif
-
 @available(iOSApplicationExtension, unavailable)
 @available(macCatalystApplicationExtension, unavailable)
 internal protocol STPPaymentHandlerActionParams: AnyObject {
-  var threeDS2Service: STDSThreeDS2Service? { get }
   var authenticationContext: STPAuthenticationContext { get }
   var apiClient: STPAPIClient { get }
-  var threeDSCustomizationSettings: STPThreeDSCustomizationSettings { get }
   var returnURLString: String? { get }
   var intentStripeID: String? { get }
   /// Returns the payment or setup intent's next action
@@ -34,7 +28,6 @@ internal class STPPaymentHandlerPaymentIntentActionParams: NSObject, STPPaymentH
 
   let authenticationContext: STPAuthenticationContext
   let apiClient: STPAPIClient
-  let threeDSCustomizationSettings: STPThreeDSCustomizationSettings
   let paymentIntentCompletion: STPPaymentHandlerActionPaymentIntentCompletionBlock
   let returnURLString: String?
   var paymentIntent: STPPaymentIntent?
@@ -43,45 +36,15 @@ internal class STPPaymentHandlerPaymentIntentActionParams: NSObject, STPPaymentH
     return paymentIntent?.stripeId
   }
 
-  private var _threeDS2Service: STDSThreeDS2Service?
-
-  var threeDS2Service: STDSThreeDS2Service? {
-    if !serviceInitialized {
-      serviceInitialized = true
-      _threeDS2Service = STDSThreeDS2Service()
-
-      STDSSwiftTryCatch.try(
-        {
-          let configParams = STDSConfigParameters()
-          if !(self.paymentIntent?.livemode ?? true) {
-            configParams.addParameterNamed("kInternalStripeTestingConfigParam", withValue: "Y")
-          }
-          self._threeDS2Service?.initialize(
-            withConfig: configParams,
-            locale: Locale.autoupdatingCurrent,
-            uiSettings: self.threeDSCustomizationSettings.uiCustomization.uiCustomization)
-        },
-        catch: { _ in
-          self._threeDS2Service = nil
-        },
-        finallyBlock: {
-        })
-    }
-
-    return _threeDS2Service
-  }
-
   init(
     apiClient: STPAPIClient,
     authenticationContext: STPAuthenticationContext,
-    threeDSCustomizationSettings: STPThreeDSCustomizationSettings,
     paymentIntent: STPPaymentIntent,
     returnURL returnURLString: String?,
     completion: @escaping STPPaymentHandlerActionPaymentIntentCompletionBlock
   ) {
     self.apiClient = apiClient
     self.authenticationContext = authenticationContext
-    self.threeDSCustomizationSettings = threeDSCustomizationSettings
     self.returnURLString = returnURLString
     self.paymentIntent = paymentIntent
     self.paymentIntentCompletion = completion
@@ -104,7 +67,6 @@ internal class STPPaymentHandlerSetupIntentActionParams: NSObject, STPPaymentHan
 
   let authenticationContext: STPAuthenticationContext
   let apiClient: STPAPIClient
-  let threeDSCustomizationSettings: STPThreeDSCustomizationSettings
   let setupIntentCompletion: STPPaymentHandlerActionSetupIntentCompletionBlock
   let returnURLString: String?
   var setupIntent: STPSetupIntent?
@@ -113,45 +75,15 @@ internal class STPPaymentHandlerSetupIntentActionParams: NSObject, STPPaymentHan
     return setupIntent?.stripeID
   }
 
-  private var _threeDS2Service: STDSThreeDS2Service?
-
-  var threeDS2Service: STDSThreeDS2Service? {
-    if !serviceInitialized {
-      serviceInitialized = true
-      _threeDS2Service = STDSThreeDS2Service()
-
-      STDSSwiftTryCatch.try(
-        {
-          let configParams = STDSConfigParameters()
-          if !(self.setupIntent?.livemode ?? true) {
-            configParams.addParameterNamed("kInternalStripeTestingConfigParam", withValue: "Y")
-          }
-          self._threeDS2Service?.initialize(
-            withConfig: configParams,
-            locale: Locale.autoupdatingCurrent,
-            uiSettings: self.threeDSCustomizationSettings.uiCustomization.uiCustomization)
-        },
-        catch: { _ in
-          self._threeDS2Service = nil
-        },
-        finallyBlock: {
-        })
-    }
-
-    return _threeDS2Service
-  }
-
   init(
     apiClient: STPAPIClient,
     authenticationContext: STPAuthenticationContext,
-    threeDSCustomizationSettings: STPThreeDSCustomizationSettings,
     setupIntent: STPSetupIntent,
     returnURL returnURLString: String?,
     completion: @escaping STPPaymentHandlerActionSetupIntentCompletionBlock
   ) {
     self.apiClient = apiClient
     self.authenticationContext = authenticationContext
-    self.threeDSCustomizationSettings = threeDSCustomizationSettings
     self.returnURLString = returnURLString
     self.setupIntent = setupIntent
     self.setupIntentCompletion = completion

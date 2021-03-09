@@ -43,16 +43,6 @@ class STPBSBNumberValidator: STPNumericStringValidator {
     return self._data(forText: text)?["name"] as? String
   }
 
-  class func icon(forText text: String?) -> UIImage {
-
-    let iconName = self._data(forText: text ?? "")?["icon"] as? String
-    if let iconName = iconName {
-      return STPImageLibrary.safeImageNamed(iconName, templateIfAvailable: false)
-    } else {
-      return STPImageLibrary.safeImageNamed("stp_icon_bank", templateIfAvailable: false)
-    }
-  }
-
   class func _isPossibleValidBSBNumber(_ text: String) -> Bool {
     if text.count == 0 || self.identity(forText: text) != nil {
       // this is faster than iterating through keys so try it first

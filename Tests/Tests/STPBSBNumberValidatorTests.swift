@@ -64,17 +64,5 @@ class STPBSBNumberValidatorTests: XCTestCase {
       }
     }
   }
-
-  func testIconForText() {
-    let defaultIcon = STPBSBNumberValidator.icon(forText: nil)
-    XCTAssertNotNil(defaultIcon, "Nil default icon")
-
-    XCTAssertEqual(defaultIcon, STPBSBNumberValidator.icon(forText: "00"))
-
-    let bankIcon = STPBSBNumberValidator.icon(forText: "11")
-    XCTAssertNotNil(bankIcon, "Nil icon for bank `11`")
-    XCTAssertFalse((defaultIcon == bankIcon), "Icon for `11` is same as default")
-
-    XCTAssertEqual(bankIcon, STPBSBNumberValidator.icon(forText: "111-111"))
-  }
+    
 }

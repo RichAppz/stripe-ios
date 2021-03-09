@@ -130,11 +130,6 @@ public typealias STPCustomerCompletionBlock = (STPCustomer?, Error?) -> Void
 ///   - status: The status to help you sort between different error state, or STPPinSuccess when succesful. - seealso: STPPinStatus for possible values.
 ///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
 public typealias STPPinCompletionBlock = (STPIssuingCardPin?, STPPinStatus, Error?) -> Void
-/// A callback to be run with a 3DS2 authenticate response from the Stripe API.
-/// - Parameters:
-///   - authenticateResponse:    The Stripe AuthenticateResponse. Will be nil if an error occurs. - seealso: STP3DS2AuthenticateResponse
-///   - error:                   The error returned from the response, or nil if none occurs.
-typealias STP3DS2AuthenticateCompletionBlock = (STP3DS2AuthenticateResponse?, Error?) -> Void
 /// A callback to be run with a response from the Stripe API containing information about the online status of FPX banks.
 /// - Parameters:
 ///   - bankStatusResponse:    The response from Stripe containing the status of the various banks. Will be nil if an error occurs. - seealso: STPFPXBankStatusResponse
