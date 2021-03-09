@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'AppClip-Stripe'
-  s.version = '1.0.0'
+  s.version = '1.0.1'
   s.license = 'MIT'
   s.summary = 'AppClip-Stripe for ApplePay ONLY'
   s.homepage = 'https://richappz.com'
