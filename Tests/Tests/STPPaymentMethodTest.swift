@@ -12,19 +12,15 @@ class STPPaymentMethodTest: XCTestCase {
   func testTypeFromString() {
     XCTAssertEqual(STPPaymentMethod.type(from: "card"), STPPaymentMethodType.card)
     XCTAssertEqual(STPPaymentMethod.type(from: "CARD"), STPPaymentMethodType.card)
-    XCTAssertEqual(STPPaymentMethod.type(from: "card_present"), STPPaymentMethodType.cardPresent)
-    XCTAssertEqual(STPPaymentMethod.type(from: "CARD_PRESENT"), STPPaymentMethodType.cardPresent)
     XCTAssertEqual(STPPaymentMethod.type(from: "unknown_string"), STPPaymentMethodType.unknown)
   }
 
   func testTypesFromStrings() {
     let rawTypes = [
       "card",
-      "card_present",
     ]
     let expectedTypes: [STPPaymentMethodType] = [
       .card,
-      .cardPresent,
     ]
     XCTAssertEqual(STPPaymentMethod.paymentMethodTypes(from: rawTypes), expectedTypes)
   }
@@ -32,7 +28,6 @@ class STPPaymentMethodTest: XCTestCase {
   func testStringFromType() {
     let values: [STPPaymentMethodType] = [
       .card,
-      .cardPresent,
       .unknown,
     ]
     for type in values {
@@ -41,8 +36,6 @@ class STPPaymentMethodTest: XCTestCase {
       switch type {
       case .card:
         XCTAssertEqual(string, "card")
-      case .cardPresent:
-        XCTAssertEqual(string, "card_present")
       case .unknown:
         XCTAssertNil(string)
       default:

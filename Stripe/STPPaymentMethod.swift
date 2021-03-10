@@ -23,8 +23,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
   @objc private(set) public var type: STPPaymentMethodType = .unknown
   /// If this is a card PaymentMethod (ie `self.type == STPPaymentMethodTypeCard`), this contains additional details.
   @objc private(set) public var card: STPPaymentMethodCard?
-  /// If this is a card present PaymentMethod (ie `self.type == STPPaymentMethodTypeCardPresent`), this contains additional details.
-  @objc private(set) public var cardPresent: STPPaymentMethodCardPresent?
   /// The ID of the Customer to which this PaymentMethod is saved. Nil when the PaymentMethod has not been saved to a Customer.
   @objc private(set) public var customerId: String?
 
@@ -40,7 +38,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
       "stripeId = \(stripeId)",
       // STPPaymentMethod details (alphabetical)
       "card = \(String(describing: card))",
-      "cardPresent = \(String(describing: cardPresent))",
       "created = \(String(describing: created))",
       "customerId = \(customerId ?? "")",
       "liveMode = \(liveMode ? "YES" : "NO")",
@@ -53,7 +50,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
   class func stringToTypeMapping() -> [String: NSNumber] {
     return [
       "card": NSNumber(value: STPPaymentMethodType.card.rawValue),
-      "card_present": NSNumber(value: STPPaymentMethodType.cardPresent.rawValue),
     ]
   }
 
@@ -117,9 +113,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
     paymentMethod.card = STPPaymentMethodCard.decodedObject(
       fromAPIResponse: dict.stp_dictionary(forKey: "card"))
     paymentMethod.type = self.type(from: dict.stp_string(forKey: "type") ?? "")
-    if let stp = dict.stp_dictionary(forKey: "card_present") {
-      paymentMethod.cardPresent = STPPaymentMethodCardPresent.decodedObject(fromAPIResponse: stp)
-    }
     paymentMethod.customerId = dict.stp_string(forKey: "customer")
     return paymentMethod
   }
@@ -133,8 +126,7 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
       } else {
         return STPCardBrandUtilities.stringFrom(.unknown) ?? ""
       }
-    case .cardPresent,  // fall through
-      .unknown:
+    case .unknown:
       return STPLocalizedString("Unknown", "Default missing source type label")
     @unknown default:
       return STPLocalizedString("Unknown", "Default missing source type label")
@@ -145,7 +137,7 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
     switch type {
     case .card:
       return true
-    case .cardPresent, .unknown:
+    case .unknown:
       return false
     @unknown default:
       return false

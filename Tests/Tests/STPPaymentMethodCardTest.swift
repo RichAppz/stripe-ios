@@ -13,41 +13,6 @@ private let kCardPaymentIntentClientSecret =
 class STPPaymentMethodCardTest: XCTestCase {
   private(set) var cardJSON: [AnyHashable: Any]?
 
-  func _retrieveCardJSON(_ completion: @escaping ([AnyHashable: Any]?) -> Void) {
-    if let cardJSON = cardJSON {
-      completion(cardJSON)
-    } else {
-      let client = STPAPIClient(publishableKey: STPTestingDefaultPublishableKey)
-      client.retrievePaymentIntent(
-        withClientSecret: kCardPaymentIntentClientSecret,
-        expand: ["payment_method"]
-      ) { [self] paymentIntent, _ in
-        cardJSON = paymentIntent?.paymentMethod?.card?.allResponseFields
-        completion(cardJSON ?? [:])
-      }
-    }
-  }
-
-  func testCorrectParsing() {
-    let retrieveJSON = XCTestExpectation(description: "Retrieve JSON")
-    _retrieveCardJSON({ json in
-      let card = STPPaymentMethodCard.decodedObject(fromAPIResponse: json)
-      XCTAssertNotNil(card, "Failed to decode JSON")
-      retrieveJSON.fulfill()
-      XCTAssertEqual(card?.brand, .visa)
-      XCTAssertEqual(card?.country, "US")
-      XCTAssertNotNil(card?.checks)
-      XCTAssertEqual(card?.expMonth, 7)
-      XCTAssertEqual(card?.expYear, 2021)
-      XCTAssertEqual(card?.funding, "credit")
-      XCTAssertEqual(card?.last4, "4242")
-      XCTAssertNotNil(card?.networks)
-      XCTAssertEqual(card?.networks?.available, ["visa"])
-      XCTAssertNil(card?.networks?.preferred)
-    })
-    wait(for: [retrieveJSON], timeout: STPTestingNetworkRequestTimeout)
-  }
-
   func testDecodedObjectFromAPIResponseRequiredFields() {
     let requiredFields: [String]? = []
 
