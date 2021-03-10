@@ -97,7 +97,7 @@ open class STPCustomerContext: NSObject, STPBackendAPIAdapter {
         var paymentMethodsExcludingApplePay: [STPPaymentMethod]? = []
         for paymentMethod in _paymentMethods ?? [] {
           let isApplePay =
-            paymentMethod.type == .card && paymentMethod.card?.wallet?.type == .applePay
+            paymentMethod.type == .card
           if !isApplePay {
             paymentMethodsExcludingApplePay?.append(paymentMethod)
           }

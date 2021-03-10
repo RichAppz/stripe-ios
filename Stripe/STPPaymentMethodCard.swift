@@ -34,8 +34,6 @@ public class STPPaymentMethodCard: NSObject, STPAPIResponseDecodable {
   @objc public private(set) var fingerprint: String?
   /// Contains information about card networks that can be used to process the payment.
   @objc public private(set) var networks: STPPaymentMethodCardNetworks?
-  /// If this Card is part of a Card Wallet, this contains the details of the Card Wallet.
-  @objc public private(set) var wallet: STPPaymentMethodCardWallet?
 
   /// Returns a string representation for the provided card brand;
   /// i.e. `STPPaymentMethodCard.string(from brand:.visa) == "Visa"`.
@@ -60,7 +58,6 @@ public class STPPaymentMethodCard: NSObject, STPAPIResponseDecodable {
       "last4 = \(last4 ?? "")",
       "fingerprint = \(fingerprint ?? "")",
       "networks = \(networks?.description ?? "")",
-      "wallet = \(wallet?.description ?? "")",
     ]
 
     return "<\(props.joined(separator: "; "))>"
@@ -89,8 +86,6 @@ public class STPPaymentMethodCard: NSObject, STPAPIResponseDecodable {
     card.fingerprint = nsDict.stp_string(forKey: "fingerprint")
     card.networks = STPPaymentMethodCardNetworks.decodedObject(
       fromAPIResponse: dict["networks"] as? [AnyHashable: Any])
-    card.wallet = STPPaymentMethodCardWallet.decodedObject(
-      fromAPIResponse: nsDict.stp_dictionary(forKey: "wallet"))
     return card
   }
 
