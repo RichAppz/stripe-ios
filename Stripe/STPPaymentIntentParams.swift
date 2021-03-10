@@ -103,10 +103,6 @@ public class STPPaymentIntentParams: NSObject {
     }
   }
 
-  /// Options to update the associated PaymentMethod during confirmation.
-  /// - seealso: STPConfirmPaymentMethodOptions
-  @objc public var paymentMethodOptions: STPConfirmPaymentMethodOptions?
-
   /// :nodoc:
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
 
@@ -142,8 +138,6 @@ public class STPPaymentIntentParams: NSObject {
       "paymentMethodParams = \(String(describing: paymentMethodParams))",
       // Mandate
       "mandateData = \(String(describing: mandateData))",
-      // PaymentMethodOptions
-      "paymentMethodOptions = @\(String(describing: paymentMethodOptions))",
       // Additional params set by app
       "additionalAPIParameters = \(additionalAPIParameters)",
     ]
@@ -189,7 +183,6 @@ extension STPPaymentIntentParams: STPFormEncodable {
       NSStringFromSelector(#selector(getter:returnURL)): "return_url",
       NSStringFromSelector(#selector(getter:useStripeSDK)): "use_stripe_sdk",
       NSStringFromSelector(#selector(getter:mandateData)): "mandate_data",
-      NSStringFromSelector(#selector(getter:paymentMethodOptions)): "payment_method_options",
     ]
   }
 }
@@ -211,7 +204,6 @@ extension STPPaymentIntentParams: NSCopying {
     copy.setupFutureUsage = setupFutureUsage
     copy.useStripeSDK = useStripeSDK
     copy.mandateData = mandateData
-    copy.paymentMethodOptions = paymentMethodOptions
     copy.additionalAPIParameters = additionalAPIParameters
 
     return copy

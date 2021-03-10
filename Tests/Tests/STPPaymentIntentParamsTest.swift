@@ -27,7 +27,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
       XCTAssertNil(params.setupFutureUsage)
       XCTAssertNil(params.useStripeSDK)
       XCTAssertNil(params.mandateData)
-      XCTAssertNil(params.paymentMethodOptions)
     }
   }
 
@@ -68,7 +67,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
     params.useStripeSDK = NSNumber(value: true)
     params.mandateData = STPMandateDataParams(
       customerAcceptance: STPMandateCustomerAcceptanceParams(type: .offline, onlineParams: nil)!)
-    params.paymentMethodOptions = STPConfirmPaymentMethodOptions()
     params.additionalAPIParameters = [
       "other_param": "other_value"
     ]
@@ -85,7 +83,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
     XCTAssertEqual(params.savePaymentMethod, paramsCopy.savePaymentMethod)
     XCTAssertEqual(params.returnURL, paramsCopy.returnURL)
     XCTAssertEqual(params.useStripeSDK, paramsCopy.useStripeSDK)
-    XCTAssertEqual(params.paymentMethodOptions, paramsCopy.paymentMethodOptions)
     XCTAssertEqual(
       params.additionalAPIParameters as NSDictionary,
       paramsCopy.additionalAPIParameters as NSDictionary)
