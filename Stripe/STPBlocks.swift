@@ -71,26 +71,6 @@ public typealias STPSetupIntentCompletionBlock = (STPSetupIntent?, Error?) -> Vo
 ///   - paymentMethod: The Stripe PaymentMethod from the response. Will be nil if an error occurs. - seealso: STPPaymentMethod
 ///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
 public typealias STPPaymentMethodCompletionBlock = (STPPaymentMethod?, Error?) -> Void
-/// A callback to be run with an array of PaymentMethods response from the Stripe API.
-/// - Parameters:
-///   - paymentMethods: An array of PaymentMethod from the response. Will be nil if an error occurs. - seealso: STPPaymentMethod
-///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
-public typealias STPPaymentMethodsCompletionBlock = ([STPPaymentMethod]?, Error?) -> Void
-/// A callback to be run with a validation result and shipping methods for a
-/// shipping address.
-/// - Parameters:
-///   - status: An enum representing whether the shipping address is valid.
-///   - shippingValidationError: If the shipping address is invalid, an error describing the issue with the address. If no error is given and the address is invalid, the default error message will be used.
-///   - shippingMethods: The shipping methods available for the address.
-///   - selectedShippingMethod: The default selected shipping method for the address.
-public typealias STPShippingMethodsCompletionBlock = (
-  STPShippingStatus, Error?, [PKShippingMethod]?, PKShippingMethod?
-) -> Void
-/// A callback to be run with a customer response from the Stripe API.
-/// - Parameters:
-///   - customer:     The Stripe customer from the response, or nil if an error occurred. - seealso: STPCustomer
-///   - error:        The error returned from the response, or nil if none occurs.
-public typealias STPCustomerCompletionBlock = (STPCustomer?, Error?) -> Void
 /// An enum representing the success and error states of PIN management
 @objc public enum STPPinStatus: Int {
   /// The verification object was already redeemed

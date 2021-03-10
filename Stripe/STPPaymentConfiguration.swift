@@ -33,19 +33,6 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
 
   /// The user is allowed to pay with FPX.
   @objc public var fpxEnabled = false
-
-  /// The shipping address fields the user must fill out when prompted for their
-  /// shipping info. Set to nil if shipping address is not required.
-  /// The default value is nil.
-  @objc public var requiredShippingAddressFields: Set<STPContactField>?
-  /// Whether the user should be prompted to verify prefilled shipping information.
-  /// The default value is YES.
-  @objc public var verifyPrefilledShippingAddress = true
-  /// The type of shipping for this purchase. This property sets the labels displayed
-  /// when the user is prompted for shipping info, and whether they should also be
-  /// asked to select a shipping method.
-  /// The default value is STPShippingTypeShipping.
-  @objc public var shippingType = STPShippingType.shipping
   /// The set of countries supported when entering an address. This property accepts
   /// a set of ISO 2-character country codes.
   /// The default value is all known countries. Setting this property will limit
@@ -121,8 +108,6 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
     let copy = STPPaymentConfiguration()
     copy.applePayEnabled = _applePayEnabled
     copy.fpxEnabled = fpxEnabled
-    copy.verifyPrefilledShippingAddress = verifyPrefilledShippingAddress
-    copy.shippingType = shippingType
     copy.companyName = companyName
     copy.appleMerchantIdentifier = appleMerchantIdentifier
     copy.canDeletePaymentOptions = canDeletePaymentOptions

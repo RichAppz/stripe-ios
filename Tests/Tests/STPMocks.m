@@ -26,19 +26,6 @@
 
 @implementation STPMocks
 
-+ (STPCustomerContext *)staticCustomerContext {
-    return [self staticCustomerContextWithCustomer:[STPFixtures customerWithSingleCardTokenSource]
-                                    paymentMethods:@[[STPFixtures paymentMethod]]];
-}
-
-+ (STPCustomerContext *)staticCustomerContextWithCustomer:(STPCustomer *)customer paymentMethods:(NSArray<STPPaymentMethod *> *)paymentMethods {
-    if (@available(iOS 13.0, *)) {
-        return [[Testing_StaticCustomerContext_Objc alloc] initWithCustomer:customer paymentMethods:paymentMethods];
-    } else {
-        return nil;
-    }
-}
-
 + (STPPaymentConfiguration *)paymentConfigurationWithApplePaySupportingDevice {
     STPPaymentConfiguration *config = [STPFixtures paymentConfiguration];
     config.appleMerchantIdentifier = @"fake_apple_merchant_id";
