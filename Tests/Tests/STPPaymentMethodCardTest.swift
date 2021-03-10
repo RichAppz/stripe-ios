@@ -34,6 +34,7 @@ class STPPaymentMethodCardTest: XCTestCase {
     let card = STPPaymentMethodCard.decodedObject(fromAPIResponse: response)
     XCTAssertEqual(card?.brand, .visa)
     XCTAssertEqual(card?.country, "US")
+    XCTAssertNotNil(card?.checks)
     XCTAssertEqual(card?.expMonth, 8)
     XCTAssertEqual(card?.expYear, 2020)
     XCTAssertEqual(card?.funding, "credit")
