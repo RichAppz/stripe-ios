@@ -213,10 +213,6 @@ NSString *const STPTestJSONSourceWeChatPay = @"WeChatPaySource";
     return [STPSource decodedObjectFromAPIResponse:dictionary];
 }
 
-+ (STPSource *)weChatPaySource {
-    return [STPSource decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:STPTestJSONSourceWeChatPay]];
-}
-
 + (STPPaymentIntent *)paymentIntent {
     return [STPPaymentIntent decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:@"PaymentIntent"]];
 }

@@ -94,51 +94,6 @@ public class STPRedirectContext: NSObject, SFSafariViewControllerDelegate, STPUR
   /// Error parameter for completion block.
   @objc internal var completionError: Error?
 
-  /// Initializer for context from an `STPSource`.
-  /// @note You must ensure that the returnURL set up in the created source
-  /// correctly goes to your app so that users can be returned once
-  /// they complete the redirect in the web broswer.
-  /// - Parameters:
-  ///   - source: The source that needs user redirect action to be taken.
-  ///   - completion: A block to fire when the action is believed to have
-  /// been completed.
-  /// - Returns: nil if the specified source is not a redirect-flow source. Otherwise
-  /// a new context object.
-  /// @note Execution of the completion block does not necessarily mean the user
-  /// successfully performed the redirect action. You should listen for source status
-  /// change webhooks on your backend to determine the result of a redirect.
-  @objc public convenience init?(
-    source: STPSource,
-    completion: @escaping STPRedirectContextSourceCompletionBlock
-  ) {
-
-    if (source.flow != .redirect && source.type != .weChatPay)
-      || !(source.status == .pending || source.status == .chargeable)
-    {
-      return nil
-    }
-
-    let nativeRedirectURL = Self.nativeRedirectURL(for: source)
-    var returnURL = source.redirect?.returnURL
-
-    if source.type == .weChatPay {
-      // Construct the returnURL for WeChat Pay:
-      //   - nativeRedirectURL looks like "weixin://app/MERCHANT_APP_ID/pay/?..."
-      //   - the WeChat app will redirect back using a URL like "MERCHANT_APP_ID://pay/?..."
-      let merchantAppID = nativeRedirectURL?.pathComponents[1]
-      returnURL = URL(string: "\(merchantAppID ?? "")://pay/")
-    }
-
-    self.init(
-      nativeRedirectURL: nativeRedirectURL,
-      redirectURL: source.redirect?.url,
-      return: returnURL
-    ) { error in
-      completion(source.stripeID, source.clientSecret, error)
-    }
-    self.source = source
-  }
-
   /// Initializer for context from an `STPPaymentIntent`.
   /// This should be used when the `status` is `STPPaymentIntentStatusRequiresAction`.
   /// If the next action involves a redirect, this init method will return a non-nil object.
@@ -208,26 +163,10 @@ public class STPRedirectContext: NSObject, SFSafariViewControllerDelegate, STPUR
         if strongSelf == nil {
           return
         }
-        // Redirect failed...
-        if strongSelf?.source?.type == .weChatPay {
-          // ...and this Source doesn't support web-based redirect — finish with an error.
-          let error = NSError(
-            domain: STPRedirectContext.STPRedirectContextErrorDomain,
-            code: STPRedirectContextError.appRedirectError.rawValue,
-            userInfo: [
-              NSLocalizedDescriptionKey: NSError.stp_unexpectedErrorMessage(),
-              STPError.errorMessageKey:
-                "Redirecting to WeChat failed. Only offer WeChat Pay if the WeChat app is installed.",
-            ])
-          stpDispatchToMainThreadIfNecessary({
-            strongSelf?.handleRedirectCompletionWithError(error, shouldDismissViewController: false)
-          })
-        } else {
-          // ...reset our state and try a web redirect
-          strongSelf?.state = .notStarted
-          strongSelf?.unsubscribeFromNotifications()
-          strongSelf?.startSafariViewControllerRedirectFlow(from: presentingViewController)
-        }
+      // ...reset our state and try a web redirect
+      strongSelf?.state = .notStarted
+      strongSelf?.unsubscribeFromNotifications()
+      strongSelf?.startSafariViewControllerRedirectFlow(from: presentingViewController)
       })
     }
   }
@@ -534,10 +473,6 @@ public class STPRedirectContext: NSObject, SFSafariViewControllerDelegate, STPUR
   class func nativeRedirectURL(for source: STPSource) -> URL? {
     var nativeURLString: String?
     switch source.type {
-    case .alipay:
-      nativeURLString = source.details?["native_url"] as? String
-    case .weChatPay:
-      nativeURLString = source.weChatPayDetails?.weChatAppURL
     default:
       // All other sources currently have no native url support
       break

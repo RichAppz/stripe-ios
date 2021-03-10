@@ -53,23 +53,7 @@ public class STPSetupIntentConfirmParams: NSObject, NSCopying, STPFormEncodable 
       if let _mandateData = _mandateData {
         return _mandateData
       }
-
-      if let paymentMethodParams = self.paymentMethodParams,
-        paymentMethodParams.type == .SEPADebit || paymentMethodParams.type == .bacsDebit
-          || paymentMethodParams.type == .AUBECSDebit
-      {
-
-        // Create default infer from client mandate_data
-        let onlineParams = STPMandateOnlineParams(ipAddress: "", userAgent: "")
-        onlineParams.inferFromClient = NSNumber(value: true)
-        let customerAcceptance = STPMandateCustomerAcceptanceParams()
-        customerAcceptance.type = .online
-        customerAcceptance.onlineParams = onlineParams
-        let mandateData = STPMandateDataParams(customerAcceptance: customerAcceptance)
-        return mandateData
-      } else {
-        return nil
-      }
+      return nil
     }
   }
   private var _mandateData: STPMandateDataParams?

@@ -60,28 +60,10 @@ import Foundation
   case bancontact
   /// A card source. - seealso: https://stripe.com/docs/sources/cards
   case card
-  /// A Giropay source. - seealso: https://stripe.com/docs/sources/giropay
-  case giropay
-  /// An iDEAL source. - seealso: https://stripe.com/docs/sources/ideal
-  @objc(STPSourceTypeiDEAL) case iDEAL
-  /// A SEPA Direct Debit source. - seealso: https://stripe.com/docs/sources/sepa-debit
-  case SEPADebit
-  /// A Sofort source. - seealso: https://stripe.com/docs/sources/sofort
-  case sofort
-  /// A 3DS card source. - seealso: https://stripe.com/docs/sources/three-d-secure
-  case threeDSecure
-  /// An Alipay source. - seealso: https://stripe.com/docs/sources/alipay
-  case alipay
   /// A P24 source. - seealso: https://stripe.com/docs/sources/p24
   case P24
-  /// An EPS source. - seealso: https://stripe.com/docs/sources/eps
-  case EPS
   /// A Multibanco source. - seealso: https://stripe.com/docs/sources/multibanco
   case multibanco
-  /// A WeChat Pay source. - seealso: https://stripe.com/docs/sources/wechat-pay
-  case weChatPay
-  /// A Klarna source. - seealso: https://stripe.com/docs/sources/klarna
-  case klarna
   /// An unknown type of source.
   case unknown
 }

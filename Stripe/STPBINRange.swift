@@ -97,69 +97,6 @@ class STPBINRange: NSObject, STPAPIResponseDecodable {
         return (self.mostSpecificBINRange(forNumber: firstFive)).brand == .unknown
     }
     
-    // This will asynchronously check if we have already fetched metadata for this prefix and if we have not will
-    // issue a network request to retrieve it if possible.
-    class func retrieveBINRanges(
-        forPrefix binPrefix: String, completion: @escaping STPRetrieveBINRangesCompletionBlock
-    ) {
-        self._retrievalQueue.async(execute: {
-            let binPrefixKey = binPrefix.stp_safeSubstring(to: kPrefixLengthForMetadataRequest)
-            if sRetrievedRanges[binPrefixKey] != nil
-                || (binPrefixKey.count) < kPrefixLengthForMetadataRequest
-                || self.isInvalidBINPrefix(binPrefixKey)
-                || !self.isVariableLengthBINPrefix(binPrefix)
-            {
-                // if we already have a metadata response or the binPrefix isn't long enough to make a request,
-                // or we know that this is not a valid BIN prefix
-                // or we know this isn't a BIN prefix that could contain variable length BINs
-                // return the bin ranges we already have on device
-                DispatchQueue.main.async(execute: {
-                    completion(self.binRanges(forNumber: binPrefix), nil)
-                })
-            } else if sPendingRequests[binPrefixKey] != nil {
-                // A request for this prefix is already in flight, add the completion block to sPendingRequests
-                if let sPendingRequest = sPendingRequests[binPrefixKey] {
-                    sPendingRequests[binPrefixKey] = sPendingRequest + [completion]
-                }
-            } else {
-                
-                sPendingRequests[binPrefixKey] = [completion]
-                
-                STPAPIClient.shared.retrieveCardBINMetadata(
-                    forPrefix: binPrefixKey,
-                    withCompletion: { cardMetadata, error in
-                        self._retrievalQueue.async(execute: {
-                            let ranges = cardMetadata?.ranges
-                            let completionBlocks = sPendingRequests[binPrefixKey]
-                            
-                            sPendingRequests.removeValue(forKey: binPrefixKey)
-                            
-                            // we'll record this response even if there was an error
-                            // this will prevent our validation from getting stuck thinking we don't
-                            // have enough info if the metadata service is down or unreachable
-                            // Could improve this in the future with "smart" retries
-                            sRetrievedRanges[binPrefixKey] = ranges ?? []
-                            self._performSync(withAllRangesLock: {
-                                STPBINRange.STPBINRangeAllRanges = STPBINRangeAllRanges + (ranges ?? [])
-                            })
-                            
-                            if ranges == nil {
-                                STPAnalyticsClient.sharedClient.logCardMetadataResponseFailure(
-                                    with: STPPaymentConfiguration.shared)
-                            }
-                            
-                            DispatchQueue.main.async(execute: {
-                                for block in completionBlocks ?? [] {
-                                    block(ranges, error)
-                                }
-                            })
-                        })
-                    })
-            }
-        })
-        
-    }
-    
     /// Number matching strategy: Truncate the longer of the two numbers (theirs and our
     /// bounds) to match the length of the shorter one, then do numerical compare.
     func matchesNumber(_ number: String) -> Bool {

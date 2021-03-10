@@ -699,23 +699,6 @@ extension STPAPIClient {
     }
 
   }
-
-  // MARK: FPX
-  /// Retrieves the online status of the FPX banks from the Stripe API.
-  /// - Parameter completion:  The callback to run with the returned FPX bank list, or an error.
-  @objc func retrieveFPXBankStatus(
-    withCompletion completion: @escaping STPFPXBankStatusCompletionBlock
-  ) {
-    APIRequest<STPFPXBankStatusResponse>.getWith(
-      self,
-      endpoint: APIEndpointFPXStatus,
-      parameters: [
-        "account_holder_type": "individual"
-      ]
-    ) { statusResponse, _, error in
-      completion(statusResponse, error)
-    }
-  }
 }
 
 // MARK: - Customers
@@ -807,50 +790,6 @@ extension STPAPIClient {
     ) { deserializer, _, error in
       completion(deserializer?.paymentMethods, error)
     }
-  }
-}
-
-extension STPAPIClient {
-  /// Retrieves possible BIN ranges for the 6 digit BIN prefix.
-  /// - Parameter completion: The callback to run with the return STPCardBINMetadata, or an error.
-  func retrieveCardBINMetadata(
-    forPrefix binPrefix: String,
-    withCompletion completion: @escaping (STPCardBINMetadata?, Error?) -> Void
-  ) {
-    assert(binPrefix.count == 6, "Requests can only be made with 6-digit binPrefixes.")
-    // not adding explicit handling for above assert as endpoint will error anyway
-    let params = [
-      "bin_prefix": binPrefix
-    ]
-
-    let url = URL(string: CardMetadataURL)
-    var request: NSMutableURLRequest?
-    if let url = url {
-      request = configuredRequest(for: url, additionalHeaders: [:])
-    }
-    request?.stp_addParameters(toURL: params)
-    request?.httpMethod = "GET"
-
-    // Perform request
-    var task: URLSessionDataTask?
-    if let request = request {
-      task = urlSession.dataTask(
-        with: request as URLRequest,
-        completionHandler: { body, response, error in
-          guard let response = response, let body = body, error == nil else {
-            completion(nil, error)
-            return
-          }
-          APIRequest<STPCardBINMetadata>.parseResponse(
-            response,
-            body: body,
-            error: error
-          ) { object, _, parsedError in
-            completion(object, parsedError)
-          }
-        })
-    }
-    task?.resume()
   }
 }
 

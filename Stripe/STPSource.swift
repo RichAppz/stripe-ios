@@ -53,15 +53,6 @@ public class STPSource: NSObject, STPAPIResponseDecodable, STPSourceProtocol, ST
   /// If this is a card source, this property provides typed access to the
   /// contents of the `details` dictionary.
   @objc public private(set) var cardDetails: STPSourceCardDetails?
-  /// If this is a Klarna source, this property provides typed access to the
-  /// contents of the `details` dictionary.
-  @objc public private(set) var klarnaDetails: STPSourceKlarnaDetails?
-  /// If this is a SEPA Debit source, this property provides typed access to the
-  /// contents of the `details` dictionary.
-  @objc public private(set) var sepaDebitDetails: STPSourceSEPADebitDetails?
-  /// If this is a WeChat Pay source, this property provides typed access to the
-  /// contents of the `details` dictionary.
-  @objc public private(set) var weChatPayDetails: STPSourceWeChatPayDetails?
   // MARK: - Deprecated
 
   /// A set of key/value pairs associated with the source object.
@@ -81,17 +72,7 @@ public class STPSource: NSObject, STPAPIResponseDecodable, STPSourceProtocol, ST
     return [
       "bancontact": NSNumber(value: STPSourceType.bancontact.rawValue),
       "card": NSNumber(value: STPSourceType.card.rawValue),
-      "giropay": NSNumber(value: STPSourceType.giropay.rawValue),
-      "ideal": NSNumber(value: STPSourceType.iDEAL.rawValue),
-      "sepa_debit": NSNumber(value: STPSourceType.SEPADebit.rawValue),
-      "sofort": NSNumber(value: STPSourceType.sofort.rawValue),
-      "three_d_secure": NSNumber(value: STPSourceType.threeDSecure.rawValue),
-      "alipay": NSNumber(value: STPSourceType.alipay.rawValue),
-      "p24": NSNumber(value: STPSourceType.P24.rawValue),
-      "eps": NSNumber(value: STPSourceType.EPS.rawValue),
       "multibanco": NSNumber(value: STPSourceType.multibanco.rawValue),
-      "wechat": NSNumber(value: STPSourceType.weChatPay.rawValue),
-      "klarna": NSNumber(value: STPSourceType.klarna.rawValue),
     ]
   }
 
@@ -301,14 +282,6 @@ public class STPSource: NSObject, STPAPIResponseDecodable, STPSourceProtocol, ST
       if let details1 = source.details {
         source.cardDetails = STPSourceCardDetails.decodedObject(fromAPIResponse: details1)
       }
-    } else if source.type == .SEPADebit {
-      source.sepaDebitDetails = STPSourceSEPADebitDetails.decodedObject(
-        fromAPIResponse: source.details)
-    } else if source.type == .weChatPay {
-      source.weChatPayDetails = STPSourceWeChatPayDetails.decodedObject(
-        fromAPIResponse: source.details)
-    } else if source.type == .klarna {
-      source.klarnaDetails = STPSourceKlarnaDetails.decodedObject(fromAPIResponse: source.details)
     }
 
     return source
@@ -325,28 +298,10 @@ public class STPSource: NSObject, STPAPIResponseDecodable, STPSourceProtocol, ST
       } else {
         return STPCard.string(from: .unknown)
       }
-    case .giropay:
-      return STPLocalizedString("Giropay", "Source type brand name")
-    case .iDEAL:
-      return STPLocalizedString("iDEAL", "Source type brand name")
-    case .SEPADebit:
-      return STPLocalizedString("SEPA Direct Debit", "Source type brand name")
-    case .sofort:
-      return STPLocalizedString("Sofort", "Source type brand name")
-    case .threeDSecure:
-      return STPLocalizedString("3D Secure", "Source type brand name")
-    case .alipay:
-      return STPLocalizedString("Alipay", "Source type brand name")
     case .P24:
       return STPLocalizedString("P24", "Source type brand name")
-    case .EPS:
-      return STPLocalizedString("EPS", "Source type brand name")
     case .multibanco:
       return STPLocalizedString("Multibanco", "Source type brand name")
-    case .weChatPay:
-      return STPLocalizedString("WeChat Pay", "Source type brand name")
-    case .klarna:
-      return STPLocalizedString("Klarna", "Source type brand name")
     case .unknown:
       return STPLocalizedString("Unknown", "Default missing source type label")
     @unknown default:

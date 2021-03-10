@@ -32,13 +32,6 @@ import Foundation
 
   /// The payment intent requires additional action handled by `STPPaymentHandler`.
   case useStripeSDK
-  
-  /// The action type is OXXO payment. We provide `STPPaymentHandler` to display
-  /// the OXXO voucher.
-  case OXXODisplayDetails
-
-  /// Contains instructions for authenticating a payment by redirecting your customer to Alipay App or website.
-  case alipayHandleRedirect
 
   /// Parse the string and return the correct `STPIntentActionType`,
   /// or `STPIntentActionTypeUnknown` if it's unrecognized by this version of the SDK.
@@ -49,10 +42,6 @@ import Foundation
       self = .redirectToURL
     case "use_stripe_sdk":
       self = .useStripeSDK
-    case "oxxo_display_details":
-      self = .OXXODisplayDetails
-    case "alipay_handle_redirect":
-      self = .alipayHandleRedirect
     default:
       self = .unknown
     }
@@ -67,10 +56,6 @@ import Foundation
       return "redirect_to_url"
     case .useStripeSDK:
       return "use_stripe_sdk"
-    case .OXXODisplayDetails:
-      return "oxxo_display_details"
-    case .alipayHandleRedirect:
-      return "alipay_handle_redirect"
     case .unknown:
       break
     }
@@ -93,12 +78,6 @@ public class STPIntentAction: NSObject {
 
   /// The details for authorizing via URL, when `type == .redirectToURL`
   @objc public let redirectToURL: STPIntentActionRedirectToURL?
-  
-  /// The details for displaying OXXO voucher via URL, when `type == .OXXODisplayDetails`
-  @objc public let oxxoDisplayDetails: STPIntentActionOXXODisplayDetails?
-
-  /// Contains instructions for authenticating a payment by redirecting your customer to Alipay App or website.
-  @objc public let alipayHandleRedirect: STPIntentActionAlipayHandleRedirect?
 
   internal let useStripeSDK: STPIntentActionUseStripeSDK?
 
@@ -124,14 +103,6 @@ public class STPIntentAction: NSObject {
       if let useStripeSDK = useStripeSDK {
         props.append("useStripeSDK = \(useStripeSDK)")
       }
-    case .OXXODisplayDetails:
-      if let oxxoDisplayDetails = oxxoDisplayDetails {
-        props.append("oxxoDisplayDetails = \(oxxoDisplayDetails)")
-      }
-    case .alipayHandleRedirect:
-      if let alipayHandleRedirect = alipayHandleRedirect {
-        props.append("alipayHandleRedirect = \(alipayHandleRedirect)")
-      }
     case .unknown:
       // unrecognized type, just show the original dictionary for debugging help
       props.append("allResponseFields = \(allResponseFields)")
@@ -143,16 +114,12 @@ public class STPIntentAction: NSObject {
   internal init(
     type: STPIntentActionType,
     redirectToURL: STPIntentActionRedirectToURL?,
-    alipayHandleRedirect: STPIntentActionAlipayHandleRedirect?,
     useStripeSDK: STPIntentActionUseStripeSDK?,
-    oxxoDisplayDetails: STPIntentActionOXXODisplayDetails?,
     allResponseFields: [AnyHashable: Any]
   ) {
     self.type = type
     self.redirectToURL = redirectToURL
-    self.alipayHandleRedirect = alipayHandleRedirect
     self.useStripeSDK = useStripeSDK
-    self.oxxoDisplayDetails = oxxoDisplayDetails
     self.allResponseFields = allResponseFields
     super.init()
   }
@@ -174,9 +141,7 @@ extension STPIntentAction: STPAPIResponseDecodable {
     // STPIntentActionRedirectToURL object fails, map type to `.unknown`
     var type = STPIntentActionType(string: rawType)
     var redirectToURL: STPIntentActionRedirectToURL?
-    var alipayHandleRedirect: STPIntentActionAlipayHandleRedirect?
     var useStripeSDK: STPIntentActionUseStripeSDK?
-    var oxxoDisplayDetails: STPIntentActionOXXODisplayDetails?
 
     switch type {
     case .unknown:
@@ -193,26 +158,12 @@ extension STPIntentAction: STPAPIResponseDecodable {
       if useStripeSDK == nil {
         type = .unknown
       }
-    case .OXXODisplayDetails:
-      oxxoDisplayDetails = STPIntentActionOXXODisplayDetails.decodedObject(
-        fromAPIResponse: dict["oxxo_display_details"] as? [AnyHashable: Any])
-      if oxxoDisplayDetails == nil {
-        type = .unknown
-      }
-    case .alipayHandleRedirect:
-      alipayHandleRedirect = STPIntentActionAlipayHandleRedirect.decodedObject(
-        fromAPIResponse: dict["alipay_handle_redirect"] as? [AnyHashable: Any])
-      if alipayHandleRedirect == nil {
-        type = .unknown
-      }
     }
 
     return STPIntentAction(
       type: type,
       redirectToURL: redirectToURL,
-      alipayHandleRedirect: alipayHandleRedirect,
       useStripeSDK: useStripeSDK,
-      oxxoDisplayDetails: oxxoDisplayDetails,
       allResponseFields: dict) as? Self
   }
 

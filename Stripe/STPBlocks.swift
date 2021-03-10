@@ -96,11 +96,6 @@ public typealias STPPaymentMethodsCompletionBlock = ([STPPaymentMethod]?, Error?
 public typealias STPShippingMethodsCompletionBlock = (
   STPShippingStatus, Error?, [PKShippingMethod]?, PKShippingMethod?
 ) -> Void
-/// A callback to be run with a file response from the Stripe API.
-/// - Parameters:
-///   - file: The Stripe file from the response. Will be nil if an error occurs. - seealso: STPFile
-///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
-public typealias STPFileCompletionBlock = (STPFile?, Error?) -> Void
 /// A callback to be run with a customer response from the Stripe API.
 /// - Parameters:
 ///   - customer:     The Stripe customer from the response, or nil if an error occurred. - seealso: STPCustomer
@@ -130,11 +125,6 @@ public typealias STPCustomerCompletionBlock = (STPCustomer?, Error?) -> Void
 ///   - status: The status to help you sort between different error state, or STPPinSuccess when succesful. - seealso: STPPinStatus for possible values.
 ///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
 public typealias STPPinCompletionBlock = (STPIssuingCardPin?, STPPinStatus, Error?) -> Void
-/// A callback to be run with a response from the Stripe API containing information about the online status of FPX banks.
-/// - Parameters:
-///   - bankStatusResponse:    The response from Stripe containing the status of the various banks. Will be nil if an error occurs. - seealso: STPFPXBankStatusResponse
-///   - error:                   The error returned from the response, or nil if none occurs.
-typealias STPFPXBankStatusCompletionBlock = (STPFPXBankStatusResponse?, Error?) -> Void
 /// A block called with a payment status and an optional error.
 /// - Parameter error: The error that occurred, if any.
 public typealias STPPaymentStatusBlock = (STPPaymentStatus, Error?) -> Void

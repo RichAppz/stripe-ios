@@ -138,11 +138,6 @@ extern NSString *const STPTestJSONSourceSofort;
  A Source object with type Alipay
  */
 + (STPSource *)alipaySource;
-
-/**
- A Source object with type WeChat Pay
- */
-+ (STPSource *)weChatPaySource;
     
 /**
  A Source object with type Alipay and a native redirect url

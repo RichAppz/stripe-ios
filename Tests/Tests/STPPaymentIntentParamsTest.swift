@@ -84,21 +84,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
     params.paymentMethodParams!.rawTypeString = "card"
     // card type should have no default mandateData
     XCTAssertNil(params.mandateData)
-
-    for type in ["sepa_debit", "au_becs_debit", "bacs_debit"] {
-      params.mandateData = nil
-      params.paymentMethodParams!.rawTypeString = type
-      // Mandate-required type should have mandateData
-      XCTAssertNotNil(params.mandateData)
-      XCTAssertEqual(
-        params.mandateData!.customerAcceptance.onlineParams!.inferFromClient, NSNumber(value: true))
-
-      params.mandateData = STPMandateDataParams(
-        customerAcceptance: STPMandateCustomerAcceptanceParams(type: .offline, onlineParams: nil)!)
-      // Default behavior should not override custom setting
-      XCTAssertNotNil(params.mandateData)
-      XCTAssertNil(params.mandateData!.customerAcceptance.onlineParams)
-    }
   }
 
   //#pragma clang diagnostic pop

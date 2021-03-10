@@ -72,39 +72,4 @@
     }
 }
 
-#pragma mark - Description Tests
-
-- (void)testDescription {
-    STPSourceVerification *verification = [STPSourceVerification decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:@"SEPADebitSource"][@"verification"]];
-    XCTAssert(verification.description);
-}
-
-#pragma mark - STPAPIResponseDecodable Tests
-
-- (void)testDecodedObjectFromAPIResponseRequiredFields {
-    NSArray<NSString *> *requiredFields = @[
-                                            @"status",
-                                            ];
-
-    for (NSString *field in requiredFields) {
-        NSMutableDictionary *response = [[STPTestUtils jsonNamed:@"SEPADebitSource"][@"verification"] mutableCopy];
-        [response removeObjectForKey:field];
-
-        XCTAssertNil([STPSourceVerification decodedObjectFromAPIResponse:response]);
-    }
-
-    XCTAssert([STPSourceVerification decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:@"SEPADebitSource"][@"verification"]]);
-}
-
-- (void)testDecodedObjectFromAPIResponseMapping {
-    NSDictionary *response = [STPTestUtils jsonNamed:@"SEPADebitSource"][@"verification"];
-    STPSourceVerification *verification = [STPSourceVerification decodedObjectFromAPIResponse:response];
-
-    XCTAssertEqualObjects(verification.attemptsRemaining, @5);
-    XCTAssertEqual(verification.status, STPSourceVerificationStatusPending);
-
-    XCTAssertNotEqual(verification.allResponseFields, response);
-    XCTAssertEqualObjects(verification.allResponseFields, response);
-}
-
 @end

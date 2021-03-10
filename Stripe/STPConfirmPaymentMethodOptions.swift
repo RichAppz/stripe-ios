@@ -16,9 +16,6 @@ public class STPConfirmPaymentMethodOptions: NSObject {
   /// - seealso: STPConfirmCardOptions
   @objc public var cardOptions: STPConfirmCardOptions?
 
-  /// Options for an Alipay Payment Method.
-  @objc public var alipayOptions: STPConfirmAlipayOptions?
-
   /// :nodoc:
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
 
@@ -27,7 +24,6 @@ public class STPConfirmPaymentMethodOptions: NSObject {
     let props: [String] = [
       // Object
       String(format: "%@: %p", NSStringFromClass(type(of: self)), self),
-      "alipay = \(String(describing: alipayOptions))",
       "card = \(String(describing: cardOptions))",
     ]
     return "<\(props.joined(separator: "; "))>"
@@ -39,7 +35,6 @@ extension STPConfirmPaymentMethodOptions: STPFormEncodable {
   @objc
   public class func propertyNamesToFormFieldNamesMapping() -> [String: String] {
     return [
-      NSStringFromSelector(#selector(getter:alipayOptions)): "alipay",
       NSStringFromSelector(#selector(getter:cardOptions)): "card",
     ]
   }

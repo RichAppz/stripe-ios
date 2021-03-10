@@ -143,7 +143,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
           || (paymentIntent.status == .processing
             && STPPaymentHandler._isProcessingIntentSuccess(
               for: paymentIntent.paymentMethod?.type ?? .unknown) ||
-            (paymentIntent.status == .requiresAction && strongSelf._isPaymentIntentNextActionVoucherBased(nextAction: paymentIntent.nextAction)))
+            (paymentIntent.status == .requiresAction))
 
         if error == nil && successIntentState {
           completion(.succeeded, paymentIntent, nil)
@@ -479,29 +479,10 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
   /// because the funds can take up to 14 days to transfer from the customer's bank.
   class func _isProcessingIntentSuccess(for type: STPPaymentMethodType) -> Bool {
     switch type {
-    /* Asynchronous */
-    case .SEPADebit,
-      .bacsDebit /* Bacs Debit takes 2-3 business days */,
-      .AUBECSDebit,
-      .sofort:
-      return true
-
     /* Synchronous */
-    case .alipay,
+    case
       .card,
-      .UPI,
-      .iDEAL,
-      .FPX,
-      .cardPresent,
-      .giropay,
-      .EPS,
-      .payPal,
-      .przelewy24,
-      .bancontact,
-      .netBanking,
-      .OXXO,
-      .grabPay,
-      .afterpayClearpay:
+      .cardPresent:
       return false
 
     case .unknown:
@@ -755,34 +736,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
               "STPIntentAction": authenticationAction.description
             ]))
       }
-
-    case .alipayHandleRedirect:
-      if let alipayHandleRedirect = authenticationAction.alipayHandleRedirect {
-        _handleRedirect(
-          to: alipayHandleRedirect.nativeURL, fallbackURL: alipayHandleRedirect.url,
-          return: alipayHandleRedirect.returnURL)
-      } else {
-        currentAction.complete(
-          with: STPPaymentHandlerActionStatus.failed,
-          error: _error(
-            for: .unsupportedAuthenticationErrorCode,
-            userInfo: [
-              "STPIntentAction": authenticationAction.description
-            ]))
-      }
-
-    case .OXXODisplayDetails:
-      if let hostedVoucherURL = authenticationAction.oxxoDisplayDetails?.hostedVoucherURL {
-        self._handleRedirect(to: hostedVoucherURL, withReturn: nil)
-      }  else {
-        currentAction.complete(
-          with: STPPaymentHandlerActionStatus.failed,
-          error: _error(
-            for: .unsupportedAuthenticationErrorCode,
-            userInfo: [
-              "STPIntentAction": authenticationAction.description
-            ]))
-      }
       
     case .useStripeSDK:
       if let useStripeSDK = authenticationAction.useStripeSDK {
@@ -823,23 +776,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     let pingMarlinIfNecessary:
       ((STPPaymentHandlerPaymentIntentActionParams, @escaping STPVoidBlock) -> Void) = {
         currentAction, completionBlock in
-        if let paymentMethod = currentAction.paymentIntent?.paymentMethod,
-          paymentMethod.type == .alipay,
-          let alipayHandleRedirect = currentAction.nextAction()?.alipayHandleRedirect,
-          let alipayReturnURL = alipayHandleRedirect.marlinReturnURL
-        {
-
-          // Make a request to the return URL
-          let request: URLRequest = URLRequest(url: alipayReturnURL)
-          let task: URLSessionDataTask = URLSession.shared.dataTask(
-            with: request,
-            completionHandler: { _, _, _ in
-              completionBlock()
-            })
-          task.resume()
-        } else {
-          completionBlock()
-        }
+        completionBlock()
       }
 
     if let currentAction = self.currentAction as? STPPaymentHandlerPaymentIntentActionParams,
@@ -1025,16 +962,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     }
     return canPresent
   }
-  
-  /// Check paymentIntent.nextAction is voucher-based payment method.
-  /// Currently only OXXO payment is voucher-based.
-  /// If it's voucher-based, the paymentIntent status stays in requiresAction until the voucher is paid or expired.
-  func _isPaymentIntentNextActionVoucherBased(nextAction: STPIntentAction?) -> Bool {
-    if let nextAction = nextAction {
-      return nextAction.type == .OXXODisplayDetails
-    }
-    return false
-  }
 
   // MARK: - SFSafariViewControllerDelegate
   /// :nodoc:
@@ -1087,7 +1014,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
       threeDSSourceID = nextAction.redirectToURL?.threeDSSourceID
     case .useStripeSDK:
       threeDSSourceID = nextAction.useStripeSDK?.threeDSSourceID
-    case .OXXODisplayDetails, .alipayHandleRedirect, .unknown:
+    case .unknown:
       break
     @unknown default:
       fatalError()
