@@ -24,8 +24,6 @@
     XCTAssertNotNil(masterpass);
     XCTAssertEqualObjects(masterpass.name, @"Jenny");
     XCTAssertEqualObjects(masterpass.email, @"jenny@example.com");
-    XCTAssertNotNil(masterpass.billingAddress);
-    XCTAssertNotNil(masterpass.shippingAddress);
 }
 
 @end

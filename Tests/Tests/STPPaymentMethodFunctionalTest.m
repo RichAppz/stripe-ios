@@ -30,23 +30,8 @@
     card.expYear = @(2022);
     card.cvc = @"100";
     
-    STPPaymentMethodAddress *billingAddress = [STPPaymentMethodAddress new];
-    billingAddress.city = @"San Francisco";
-    billingAddress.country = @"US";
-    billingAddress.line1 = @"150 Townsend St";
-    billingAddress.line2 = @"4th Floor";
-    billingAddress.postalCode = @"94103";
-    billingAddress.state = @"CA";
-    
-    STPPaymentMethodBillingDetails *billingDetails = [STPPaymentMethodBillingDetails new];
-    billingDetails.address = billingAddress;
-    billingDetails.email = @"email@email.com";
-    billingDetails.name = @"Isaac Asimov";
-    billingDetails.phone = @"555-555-5555";
-    
     
     STPPaymentMethodParams *params = [STPPaymentMethodParams paramsWithCard:card
-                                                                 billingDetails:billingDetails
                                                                        metadata:@{@"test_key": @"test_value"}];
     XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Method Card create"];
     [client createPaymentMethodWithParams:params
@@ -57,19 +42,6 @@
                                    XCTAssertNotNil(paymentMethod.created);
                                    XCTAssertFalse(paymentMethod.liveMode);
                                    XCTAssertEqual(paymentMethod.type, STPPaymentMethodTypeCard);
-
-                                   // Billing Details
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.email, @"email@email.com");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.name, @"Isaac Asimov");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.phone, @"555-555-5555");
-                                   
-                                   // Billing Details Address
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.address.line1, @"150 Townsend St");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.address.line2, @"4th Floor");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.address.city, @"San Francisco");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.address.country, @"US");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.address.state, @"CA");
-                                   XCTAssertEqualObjects(paymentMethod.billingDetails.address.postalCode, @"94103");
                                    
                                    // Card
                                    XCTAssertEqual(paymentMethod.card.brand, STPCardBrandVisa);

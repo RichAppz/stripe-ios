@@ -123,8 +123,6 @@
         [self.apiClient retrievePaymentIntentWithClientSecret:clientSecret completion:^(STPPaymentIntent * _Nullable paymentIntent, NSError *paymentIntentRetrieveError) {
             XCTAssertNil(paymentIntentRetrieveError);
             XCTAssert(paymentIntent.status == STPPaymentIntentStatusSucceeded);
-            XCTAssertEqualObjects(paymentIntent.shipping.name, @"Jane Doe");
-            XCTAssertEqualObjects(paymentIntent.shipping.address.line1, @"510 Townsend St");
             [didCallCompletion fulfill];
         }];
     };

@@ -30,7 +30,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
       XCTAssertNil(params.useStripeSDK)
       XCTAssertNil(params.mandateData)
       XCTAssertNil(params.paymentMethodOptions)
-      XCTAssertNil(params.shipping)
     }
   }
 
@@ -75,8 +74,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
     params.additionalAPIParameters = [
       "other_param": "other_value"
     ]
-    params.shipping = STPPaymentIntentShippingDetailsParams(
-      address: STPPaymentIntentShippingDetailsAddressParams(line1: ""), name: "")
 
     let paramsCopy = params.copy() as! STPPaymentIntentParams
     XCTAssertEqual(params.clientSecret, paramsCopy.clientSecret)
@@ -85,7 +82,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
     // assert equal, not equal objects, because this is a shallow copy
     XCTAssertEqual(params.paymentMethodParams, paramsCopy.paymentMethodParams)
     XCTAssertEqual(params.mandateData, paramsCopy.mandateData)
-    XCTAssertEqual(params.shipping, paramsCopy.shipping)
 
     XCTAssertEqual(params.setupFutureUsage, STPPaymentIntentSetupFutureUsage.none)
     XCTAssertEqual(params.savePaymentMethod, paramsCopy.savePaymentMethod)

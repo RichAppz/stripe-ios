@@ -15,10 +15,6 @@ public class STPPaymentMethodCardWalletVisaCheckout: NSObject, STPAPIResponseDec
   @objc public private(set) var email: String?
   /// Owner’s verified email. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
   @objc public private(set) var name: String?
-  /// Owner’s verified billing address. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
-  @objc public private(set) var billingAddress: STPPaymentMethodAddress?
-  /// Owner’s verified shipping address. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
-  @objc public private(set) var shippingAddress: STPPaymentMethodAddress?
   private(set) public var allResponseFields: [AnyHashable: Any] = [:]
 
   override required init() {
@@ -34,10 +30,6 @@ public class STPPaymentMethodCardWalletVisaCheckout: NSObject, STPAPIResponseDec
 
     let visaCheckout = self.init()
     visaCheckout.allResponseFields = response
-    visaCheckout.billingAddress = STPPaymentMethodAddress.decodedObject(
-      fromAPIResponse: dict.stp_dictionary(forKey: "billing_address"))
-    visaCheckout.shippingAddress = STPPaymentMethodAddress.decodedObject(
-      fromAPIResponse: dict.stp_dictionary(forKey: "shipping_address"))
     visaCheckout.email = dict.stp_string(forKey: "email")
     visaCheckout.name = dict.stp_string(forKey: "name")
     return visaCheckout

@@ -57,10 +57,8 @@ extension STPAPIClient {
       } else {
         let cardParams = STPPaymentMethodCardParams()
         cardParams.token = token?.tokenId
-        let billingDetails = STPAPIClient.billingDetails(from: payment)
         let paymentMethodParams = STPPaymentMethodParams(
           card: cardParams,
-          billingDetails: billingDetails,
           metadata: nil)
         self.createPaymentMethod(with: paymentMethodParams, completion: completion)
       }
@@ -90,49 +88,6 @@ extension STPAPIClient {
       return NSError(domain: STPError.stripeDomain, code: errorCode.rawValue, userInfo: userInfo)
     }
     return stripeError
-  }
-
-  class func billingDetails(from payment: PKPayment) -> STPPaymentMethodBillingDetails? {
-    var billingDetails: STPPaymentMethodBillingDetails?
-    if payment.billingContact != nil {
-      billingDetails = STPPaymentMethodBillingDetails()
-      var billingAddress: STPAddress?
-      if let billingContact = payment.billingContact {
-        billingAddress = STPAddress(pkContact: billingContact)
-      }
-      billingDetails?.name = billingAddress?.name
-      billingDetails?.email = billingAddress?.email
-      billingDetails?.phone = billingAddress?.phone
-      if payment.billingContact?.postalAddress != nil {
-        if let billingAddress = billingAddress {
-          billingDetails?.address = STPPaymentMethodAddress(address: billingAddress)
-        }
-      }
-    }
-
-    // The phone number and email in the "Contact" panel in the Apple Pay dialog go into the shippingContact,
-    // not the billingContact. To work around this, we should fill the billingDetails' email and phone
-    // number from the shippingDetails.
-    if payment.shippingContact != nil {
-      var shippingAddress: STPAddress?
-      if let shippingContact = payment.shippingContact {
-        shippingAddress = STPAddress(pkContact: shippingContact)
-      }
-      if billingDetails?.email == nil && shippingAddress?.email != nil {
-        if billingDetails == nil {
-          billingDetails = STPPaymentMethodBillingDetails()
-        }
-        billingDetails?.email = shippingAddress?.email
-      }
-      if billingDetails?.phone == nil && shippingAddress?.phone != nil {
-        if billingDetails == nil {
-          billingDetails = STPPaymentMethodBillingDetails()
-        }
-        billingDetails?.phone = shippingAddress?.phone
-      }
-    }
-
-    return billingDetails
   }
 
   class func addressParams(from contact: PKContact?) -> [AnyHashable: Any]? {

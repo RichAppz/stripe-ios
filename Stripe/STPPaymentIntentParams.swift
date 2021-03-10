@@ -112,9 +112,6 @@ public class STPPaymentIntentParams: NSObject {
   /// - seealso: STPConfirmPaymentMethodOptions
   @objc public var paymentMethodOptions: STPConfirmPaymentMethodOptions?
 
-  /// Shipping information.
-  @objc public var shipping: STPPaymentIntentShippingDetailsParams?
-
   /// :nodoc:
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
 
@@ -142,7 +139,6 @@ public class STPPaymentIntentParams: NSObject {
       "returnURL = \(String(describing: returnURL))",
       "savePaymentMethod = \(String(describing: savePaymentMethod?.boolValue))",
       "setupFutureUsage = \(String(describing: setupFutureUsage))",
-      "shipping = \(String(describing: shipping))",
       "useStripeSDK = \(String(describing: useStripeSDK?.boolValue))",
       // Source
       "sourceId = \(String(describing: sourceId))",
@@ -201,7 +197,6 @@ extension STPPaymentIntentParams: STPFormEncodable {
       NSStringFromSelector(#selector(getter:useStripeSDK)): "use_stripe_sdk",
       NSStringFromSelector(#selector(getter:mandateData)): "mandate_data",
       NSStringFromSelector(#selector(getter:paymentMethodOptions)): "payment_method_options",
-      NSStringFromSelector(#selector(getter:shipping)): "shipping",
     ]
   }
 }
@@ -225,7 +220,6 @@ extension STPPaymentIntentParams: NSCopying {
     copy.useStripeSDK = useStripeSDK
     copy.mandateData = mandateData
     copy.paymentMethodOptions = paymentMethodOptions
-    copy.shipping = shipping
     copy.additionalAPIParameters = additionalAPIParameters
 
     return copy

@@ -23,8 +23,6 @@
     XCTAssertNotNil(visaCheckout);
     XCTAssertEqualObjects(visaCheckout.name, @"Jenny");
     XCTAssertEqualObjects(visaCheckout.email, @"jenny@example.com");
-    XCTAssertNotNil(visaCheckout.billingAddress);
-    XCTAssertNotNil(visaCheckout.shippingAddress);
 }
 
 @end

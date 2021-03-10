@@ -15,10 +15,6 @@ public class STPPaymentMethodCardWalletMasterpass: NSObject, STPAPIResponseDecod
   @objc public private(set) var email: String?
   /// Owner’s verified email. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
   @objc public private(set) var name: String?
-  /// Owner’s verified billing address. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
-  @objc public private(set) var billingAddress: STPPaymentMethodAddress?
-  /// Owner’s verified shipping address. Values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement.
-  @objc public private(set) var shippingAddress: STPPaymentMethodAddress?
   @objc public private(set) var allResponseFields: [AnyHashable: Any] = [:]
 
   /// :nodoc:
@@ -30,8 +26,6 @@ public class STPPaymentMethodCardWalletMasterpass: NSObject, STPAPIResponseDecod
       // Properties
       "email: \(email ?? "")",
       "name: \(name ?? "")",
-      "billingAddress: \(String(describing: billingAddress))",
-      "shippingAddress: \(String(describing: shippingAddress))",
     ]
     return "<\(props.joined(separator: "; "))>"
   }
@@ -50,10 +44,6 @@ public class STPPaymentMethodCardWalletMasterpass: NSObject, STPAPIResponseDecod
 
     let masterpass = self.init()
     masterpass.allResponseFields = response
-    masterpass.billingAddress = STPPaymentMethodAddress.decodedObject(
-      fromAPIResponse: dict.stp_dictionary(forKey: "billing_address"))
-    masterpass.shippingAddress = STPPaymentMethodAddress.decodedObject(
-      fromAPIResponse: dict.stp_dictionary(forKey: "shipping_address"))
     masterpass.email = dict.stp_string(forKey: "email")
     masterpass.name = dict.stp_string(forKey: "name")
     return masterpass

@@ -35,8 +35,6 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
   /// Setting this to a value not known by the SDK causes `type` to
   /// return `STPPaymentMethodTypeUnknown`
   @objc public var rawTypeString: String?
-  /// Billing information associated with the PaymentMethod that may be used or required by particular types of payment methods.
-  @objc public var billingDetails: STPPaymentMethodBillingDetails?
   /// If this is a card PaymentMethod, this contains the user’s card details.
   @objc public var card: STPPaymentMethodCardParams?
   
@@ -46,17 +44,15 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
   /// Creates params for a card PaymentMethod.
   /// - Parameters:
   ///   - card:                An object containing the user's card details.
-  ///   - billingDetails:      An object containing the user's billing details.
   ///   - metadata:            Additional information to attach to the PaymentMethod.
   @objc
   public convenience init(
-    card: STPPaymentMethodCardParams, billingDetails: STPPaymentMethodBillingDetails?,
+    card: STPPaymentMethodCardParams,
     metadata: [String: String]?
   ) {
     self.init()
     self.type = .card
     self.card = card
-    self.billingDetails = billingDetails
     self.metadata = metadata
   }
 
@@ -85,7 +81,6 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
   public class func propertyNamesToFormFieldNamesMapping() -> [String: String] {
     return [
       NSStringFromSelector(#selector(getter:rawTypeString)): "type",
-      NSStringFromSelector(#selector(getter:billingDetails)): "billing_details",
       NSStringFromSelector(#selector(getter:card)): "card",
     ]
   }
@@ -128,11 +123,11 @@ extension STPPaymentMethodParams {
   ///   - card:                An object containing the user's card details.
   ///   - billingDetails:      An object containing the user's billing details.
   ///   - metadata:            Additional information to attach to the PaymentMethod.
-  @objc(paramsWithCard:billingDetails:metadata:)
+  @objc(paramsWithCard:metadata:)
   public class func paramsWith(
-    card: STPPaymentMethodCardParams, billingDetails: STPPaymentMethodBillingDetails?,
+    card: STPPaymentMethodCardParams,
     metadata: [String: String]?
   ) -> STPPaymentMethodParams {
-    return STPPaymentMethodParams(card: card, billingDetails: billingDetails, metadata: metadata)
+    return STPPaymentMethodParams(card: card, metadata: metadata)
   }
 }

@@ -106,20 +106,6 @@ class STPPaymentIntentTest: XCTestCase {
     XCTAssertNotNil(paymentIntent.lastPaymentError!.paymentMethod)
     XCTAssertEqual(paymentIntent.lastPaymentError!.type, .invalidRequest)
 
-    // Shipping
-    XCTAssertNotNil(paymentIntent.shipping)
-    XCTAssertEqual(paymentIntent.shipping!.carrier, "USPS")
-    XCTAssertEqual(paymentIntent.shipping!.name, "Dan")
-    XCTAssertEqual(paymentIntent.shipping!.phone, "1-415-555-1234")
-    XCTAssertEqual(paymentIntent.shipping!.trackingNumber, "xyz123abc")
-    XCTAssertNotNil(paymentIntent.shipping!.address)
-    XCTAssertEqual(paymentIntent.shipping!.address!.city, "San Francisco")
-    XCTAssertEqual(paymentIntent.shipping!.address!.country, "USA")
-    XCTAssertEqual(paymentIntent.shipping!.address!.line1, "123 Main St")
-    XCTAssertEqual(paymentIntent.shipping!.address!.line2, "Apt 456")
-    XCTAssertEqual(paymentIntent.shipping!.address!.postalCode, "94107")
-    XCTAssertEqual(paymentIntent.shipping!.address!.state, "CA")
-
     XCTAssertEqual(paymentIntent.allResponseFields as NSDictionary, response as NSDictionary)
   }
 }

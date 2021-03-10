@@ -90,24 +90,6 @@ public class STPAddress: NSObject {
     super.init()
   }
 
-  /// Initializes a new STPAddress with data from STPPaymentMethodBillingDetails.
-  /// - Parameter billingDetails: The STPPaymentMethodBillingDetails instance you want to populate the STPAddress from.
-  /// - Returns: A new STPAddress instance with data copied from the passed in billing details.
-  @objc
-  public init(paymentMethodBillingDetails billingDetails: STPPaymentMethodBillingDetails) {
-    super.init()
-    name = billingDetails.name
-    phone = billingDetails.phone
-    email = billingDetails.email
-    let pmAddress = billingDetails.address
-    line1 = pmAddress?.line1
-    line2 = pmAddress?.line2
-    city = pmAddress?.city
-    state = pmAddress?.state
-    postalCode = pmAddress?.postalCode
-    country = pmAddress?.country
-  }
-
   /// Initializes a new STPAddress with data from an PassKit contact.
   /// - Parameter contact: The PassKit contact you want to populate the STPAddress from.
   /// - Returns: A new STPAddress instance with data copied from the passed in contact.

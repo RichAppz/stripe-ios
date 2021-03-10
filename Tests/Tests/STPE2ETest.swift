@@ -67,7 +67,7 @@ class STPE2ETest: XCTestCase {
         testCard.expYear = 2050
         testCard.expMonth = 12
         testCard.cvc = "123"
-        return STPPaymentMethodParams(card: testCard, billingDetails: nil, metadata: nil)
+        return STPPaymentMethodParams(card: testCard, metadata: nil)
     }()
 
     // MARK: LOG.04.01c

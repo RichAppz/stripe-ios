@@ -118,9 +118,6 @@ public class STPPaymentIntent: NSObject {
   /// The payment error encountered in the previous PaymentIntent confirmation.
   @objc public let lastPaymentError: STPPaymentIntentLastPaymentError?
 
-  /// Shipping information for this PaymentIntent.
-  @objc public let shipping: STPPaymentIntentShippingDetails?
-
   @objc public let allResponseFields: [AnyHashable: Any]
 
   /// The optionally expanded PaymentMethod used in this PaymentIntent.
@@ -150,7 +147,6 @@ public class STPPaymentIntent: NSObject {
       "paymentMethodTypes = \(String(describing: allResponseFields["payment_method_types"] as? [String]))",
       "receiptEmail = \(String(describing: receiptEmail))",
       "setupFutureUsage = \(String(describing: allResponseFields["setup_future_usage"] as? String))",
-      "shipping = \(String(describing: shipping))",
       "sourceId = \(String(describing: sourceId))",
       "status = \(String(describing: allResponseFields["status"] as? String))",
     ]
@@ -175,7 +171,6 @@ public class STPPaymentIntent: NSObject {
     paymentMethodTypes: [NSNumber],
     receiptEmail: String?,
     setupFutureUsage: STPPaymentIntentSetupFutureUsage,
-    shipping: STPPaymentIntentShippingDetails?,
     sourceId: String?,
     status: STPPaymentIntentStatus,
     stripeDescription: String?,
@@ -197,7 +192,6 @@ public class STPPaymentIntent: NSObject {
     self.paymentMethodTypes = paymentMethodTypes
     self.receiptEmail = receiptEmail
     self.setupFutureUsage = setupFutureUsage
-    self.shipping = shipping
     self.sourceId = sourceId
     self.status = status
     self.stripeDescription = stripeDescription
@@ -251,8 +245,6 @@ extension STPPaymentIntent: STPAPIResponseDecodable {
       receiptEmail: dict["receipt_email"] as? String,
       setupFutureUsage: setupFutureUsageString != nil
         ? STPPaymentIntentSetupFutureUsage(string: setupFutureUsageString!) : .none,
-      shipping: STPPaymentIntentShippingDetails.decodedObject(
-        fromAPIResponse: dict["shipping"] as? [AnyHashable: Any]),
       sourceId: dict["source"] as? String,
       status: STPPaymentIntentStatus.status(from: rawStatus),
       stripeDescription: dict["description"] as? String,

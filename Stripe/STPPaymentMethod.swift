@@ -21,8 +21,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
   /// The type of the PaymentMethod.  The corresponding, similarly named property contains additional information specific to the PaymentMethod type.
   /// e.g. if the type is `STPPaymentMethodTypeCard`, the `card` property is also populated.
   @objc private(set) public var type: STPPaymentMethodType = .unknown
-  /// Billing information associated with the PaymentMethod that may be used or required by particular types of payment methods.
-  @objc private(set) public var billingDetails: STPPaymentMethodBillingDetails?
   /// If this is a card PaymentMethod (ie `self.type == STPPaymentMethodTypeCard`), this contains additional details.
   @objc private(set) public var card: STPPaymentMethodCard?
   /// If this is a card present PaymentMethod (ie `self.type == STPPaymentMethodTypeCardPresent`), this contains additional details.
@@ -41,7 +39,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
       // Identifier
       "stripeId = \(stripeId)",
       // STPPaymentMethod details (alphabetical)
-      "billingDetails = \(String(describing: billingDetails))",
       "card = \(String(describing: card))",
       "cardPresent = \(String(describing: cardPresent))",
       "created = \(String(describing: created))",
@@ -117,8 +114,6 @@ public class STPPaymentMethod: NSObject, STPAPIResponseDecodable, STPPaymentOpti
     paymentMethod.stripeId = stripeId
     paymentMethod.created = dict.stp_date(forKey: "created")
     paymentMethod.liveMode = dict.stp_bool(forKey: "livemode", or: false)
-    paymentMethod.billingDetails = STPPaymentMethodBillingDetails.decodedObject(
-      fromAPIResponse: dict.stp_dictionary(forKey: "billing_details"))
     paymentMethod.card = STPPaymentMethodCard.decodedObject(
       fromAPIResponse: dict.stp_dictionary(forKey: "card"))
     paymentMethod.type = self.type(from: dict.stp_string(forKey: "type") ?? "")

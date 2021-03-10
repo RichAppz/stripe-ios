@@ -100,19 +100,5 @@ class STPApplePayContextTest: XCTestCase {
     address.postalCode = "94105"
     shipping.postalAddress = address
     payment.perform(#selector(setter:PKPaymentRequest.shippingContact), with: shipping)
-
-    let shippingParams = context!._shippingDetails(from: payment)
-    XCTAssertNotNil(shippingParams)
-    XCTAssertEqual(shippingParams?.name, "Jane Doe")
-    XCTAssertNil(shippingParams?.carrier)
-    XCTAssertEqual(shippingParams?.phone, "555-555-5555")
-    XCTAssertNil(shippingParams?.trackingNumber)
-
-    XCTAssertEqual(shippingParams?.address.line1, "510 Townsend St")
-    XCTAssertNil(shippingParams?.address.line2)
-    XCTAssertEqual(shippingParams?.address.city, "San Francisco")
-    XCTAssertEqual(shippingParams?.address.state, "CA")
-    XCTAssertEqual(shippingParams?.address.country, "US")
-    XCTAssertEqual(shippingParams?.address.postalCode, "94105")
   }
 }

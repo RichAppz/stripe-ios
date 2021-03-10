@@ -216,29 +216,6 @@ import PassKit
     delegate = nil
   }
 
-  func _shippingDetails(from payment: PKPayment) -> STPPaymentIntentShippingDetailsParams? {
-    guard let address = payment.shippingContact?.postalAddress,
-      let name = payment.shippingContact?.name
-    else {
-      // The shipping address street and name are required parameters for a valid STPPaymentIntentShippingDetailsParams
-      return nil
-    }
-
-    let addressParams = STPPaymentIntentShippingDetailsAddressParams(line1: address.street)
-    addressParams.city = address.city
-    addressParams.state = address.state
-    addressParams.country = address.isoCountryCode
-    addressParams.postalCode = address.postalCode
-
-    let formatter = PersonNameComponentsFormatter()
-    formatter.style = .long
-    let shippingParams = STPPaymentIntentShippingDetailsParams(
-      address: addressParams, name: formatter.string(from: name))
-    shippingParams.phone = payment.shippingContact?.phoneNumber?.stringValue
-
-    return shippingParams
-  }
-
   // MARK: - PKPaymentAuthorizationControllerDelegate
   /// :nodoc:
   public func paymentAuthorizationController(
@@ -400,7 +377,6 @@ import PassKit
               clientSecret: paymentIntentClientSecret ?? "")
             paymentIntentParams.paymentMethodId = paymentMethod.stripeId
             paymentIntentParams.useStripeSDK = NSNumber(value: true)
-            paymentIntentParams.shipping = self._shippingDetails(from: payment)
 
             self.paymentState = .pending
 

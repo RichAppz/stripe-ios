@@ -77,7 +77,6 @@ class STPPaymentMethodTest: XCTestCase {
     XCTAssertEqual(paymentMethod?.created, Date(timeIntervalSince1970: 123_456_789))
     XCTAssertEqual(paymentMethod?.liveMode, false)
     XCTAssertEqual(paymentMethod?.type, .card)
-    XCTAssertNotNil(paymentMethod?.billingDetails)
     XCTAssertNotNil(paymentMethod?.card)
     XCTAssertNil(paymentMethod?.customerId)
     XCTAssertEqual(paymentMethod!.allResponseFields as NSDictionary, response! as NSDictionary)
