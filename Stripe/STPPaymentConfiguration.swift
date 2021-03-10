@@ -34,12 +34,6 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
   /// The user is allowed to pay with FPX.
   @objc public var fpxEnabled = false
 
-  /// The billing address fields the user must fill out when prompted for their
-  /// payment details. These fields will all be present on the returned PaymentMethod from
-  /// Stripe.
-  /// The default value is `STPBillingAddressFieldsPostalCode`.
-  /// - seealso: https://stripe.com/docs/api/payment_methods/create#create_payment_method-billing_details
-  @objc public var requiredBillingAddressFields = STPBillingAddressFields.postalCode
   /// The shipping address fields the user must fill out when prompted for their
   /// shipping info. Set to nil if shipping address is not required.
   /// The default value is nil.
@@ -104,44 +98,11 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
 
     additionalPaymentOptionsDescription = paymentOptions.joined(separator: "|")
 
-    var requiredBillingAddressFieldsDescription: String?
-
-    switch requiredBillingAddressFields {
-    case .none:
-      requiredBillingAddressFieldsDescription = "STPBillingAddressFieldsNone"
-    case .postalCode:
-      requiredBillingAddressFieldsDescription = "STPBillingAddressFieldsPostalCode"
-    case .full:
-      requiredBillingAddressFieldsDescription = "STPBillingAddressFieldsFull"
-    case .name:
-      requiredBillingAddressFieldsDescription = "STPBillingAddressFieldsName"
-    default:
-      break
-    }
-
-    let requiredShippingAddressFieldsDescription = requiredShippingAddressFields?.map({
-      $0.rawValue
-    }).joined(separator: "|")
-
-    var shippingTypeDescription: String?
-
-    switch shippingType {
-    case .shipping:
-      shippingTypeDescription = "STPShippingTypeShipping"
-    case .delivery:
-      shippingTypeDescription = "STPShippingTypeDelivery"
-    }
-
     let props = [
       // Object
       String(format: "%@: %p", NSStringFromClass(STPPaymentConfiguration.self), self),
       // Basic configuration
       "additionalPaymentOptions = \(additionalPaymentOptionsDescription ?? "")",
-      // Billing and shipping
-      "requiredBillingAddressFields = \(requiredBillingAddressFieldsDescription ?? "")",
-      "requiredShippingAddressFields = \(requiredShippingAddressFieldsDescription ?? "")",
-      "verifyPrefilledShippingAddress = \((verifyPrefilledShippingAddress) ? "YES" : "NO")",
-      "shippingType = \(shippingTypeDescription ?? "")",
       "availableCountries = \(availableCountries )",
       // Additional configuration
       "companyName = \(companyName )",
@@ -160,8 +121,6 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
     let copy = STPPaymentConfiguration()
     copy.applePayEnabled = _applePayEnabled
     copy.fpxEnabled = fpxEnabled
-    copy.requiredBillingAddressFields = requiredBillingAddressFields
-    copy.requiredShippingAddressFields = requiredShippingAddressFields
     copy.verifyPrefilledShippingAddress = verifyPrefilledShippingAddress
     copy.shippingType = shippingType
     copy.companyName = companyName

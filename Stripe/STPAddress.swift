@@ -18,8 +18,6 @@ import PassKit
 public enum STPBillingAddressFields: UInt {
   /// No billing address information
   case none
-  /// Just request the user's billing postal code
-  case postalCode
   /// Request the user's full billing address
   case full
   /// Just request the user's billing name
@@ -167,10 +165,6 @@ public class STPAddress: NSObject {
     switch requiredFields {
     case .none:
       return true
-    case .postalCode:
-      return STPPostalCodeValidator.validationState(
-        forPostalCode: postalCode,
-        countryCode: country) == .valid
     case .full:
       return hasValidPostalAddress()
     case .name:
@@ -195,8 +189,6 @@ public class STPAddress: NSObject {
     switch desiredFields {
     case .none:
       return false
-    case .postalCode:
-      return (postalCode?.count ?? 0) > 0
     case .full:
       return hasPartialPostalAddress()
     case .name:
@@ -273,7 +265,7 @@ public class STPAddress: NSObject {
     switch billingAddressFields {
     case .none:
       return Set<PKContactField>([])
-    case .postalCode, .full:
+    case .full:
       return Set<PKContactField>([.name, .postalAddress])
     case .name:
       return Set<PKContactField>([.name])
@@ -366,9 +358,6 @@ public class STPAddress: NSObject {
   private func hasValidPostalAddress() -> Bool {
     return (line1?.count ?? 0) > 0 && (city?.count ?? 0) > 0 && (country?.count ?? 0) > 0
       && ((state?.count ?? 0) > 0 || !(country == "US"))
-      && (STPPostalCodeValidator.validationState(
-        forPostalCode: postalCode,
-        countryCode: country) == .valid)
   }
 
   /// Does this STPAddress contain any data in the postal address fields?

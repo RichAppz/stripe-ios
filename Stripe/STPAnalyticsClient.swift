@@ -139,19 +139,6 @@ extension STPAnalyticsClient {
       dictionary["additional_payment_methods"] = "applepay,fpx"
     }
 
-    switch configuration.requiredBillingAddressFields {
-    case .none:
-      dictionary["required_billing_address_fields"] = "none"
-    case .postalCode:
-      dictionary["required_billing_address_fields"] = "zip"
-    case .full:
-      dictionary["required_billing_address_fields"] = "full"
-    case .name:
-      dictionary["required_billing_address_fields"] = "name"
-    default:
-      fatalError()
-    }
-
     var shippingFields: [String] = []
     if let shippingAddressFields = configuration.requiredShippingAddressFields {
       if shippingAddressFields.contains(.name) {
