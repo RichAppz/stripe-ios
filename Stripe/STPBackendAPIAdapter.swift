@@ -19,6 +19,16 @@ import UIKit
 /// your own backend instead of using `STPCustomerContext`, you should make your
 /// application's API client conform to this interface.
 @objc public protocol STPBackendAPIAdapter: NSObjectProtocol {
+  /// Retrieve the customer to be displayed inside a payment context.
+  /// If you are not using STPCustomerContext:
+  /// On your backend, retrieve the Stripe customer associated with your currently
+  /// logged-in user ( https://stripe.com/docs/api#retrieve_customer ), and return
+  /// the raw JSON response from the Stripe API. Back in your iOS app, after you've
+  /// called this API, deserialize your API response into an `STPCustomer` object
+  /// (you can use the `STPCustomerDeserializer` class to do this).
+  /// - seealso: STPCard
+  /// - Parameter completion: call this callback when you're done fetching and parsing the above information from your backend. For example, `completion(customer, nil)` (if your call succeeds) or `completion(nil, error)` if an error is returned.
+  func retrieveCustomer(_ completion: STPCustomerCompletionBlock?)
   /// Retrieves a list of Payment Methods attached to a customer.
   /// If you are implementing your own <STPBackendAPIAdapter>:
   /// Call the list method ( https://stripe.com/docs/api/payment_methods/lists )
