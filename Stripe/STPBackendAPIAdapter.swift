@@ -55,18 +55,4 @@ import UIKit
   /// succeeds) or `completion(error)` if an error is returned.
   @objc optional func detachPaymentMethod(
     fromCustomer paymentMethod: STPPaymentMethod, completion: STPErrorBlock?)
-  /// Sets the given shipping address on the customer.
-  /// If you are implementing your own <STPBackendAPIAdapter>:
-  /// On your backend, retrieve the Stripe customer associated with your logged-in user.
-  /// Then, call the Customer Update method ( https://stripe.com/docs/api#update_customer )
-  /// specifying shipping to be the given shipping address. If this API call succeeds,
-  /// call `completion(nil)`. Otherwise, call `completion(error)` with the error that occurred.
-  /// - Parameters:
-  ///   - shipping:   The shipping address to set on the customer
-  ///   - completion: call this callback when you're done updating the customer on
-  /// your backend. For example, `completion(nil)` (if your call succeeds) or
-  /// `completion(error)` if an error is returned.
-  /// - seealso: https://stripe.com/docs/api#update_customer
-  @objc optional func updateCustomer(
-    withShippingAddress shipping: STPAddress, completion: STPErrorBlock?)
 }

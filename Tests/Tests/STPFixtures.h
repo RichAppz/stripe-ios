@@ -26,11 +26,6 @@ extern NSString *const STPTestJSONSourceCard;
 @interface STPFixtures : NSObject
 
 /**
- An Address object with all fields filled.
- */
-+ (STPAddress *)address;
-
-/**
  A PKPaymentObject with test payment data.
  */
 + (PKPayment *)applePayPayment;

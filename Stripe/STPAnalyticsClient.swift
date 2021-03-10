@@ -139,34 +139,6 @@ extension STPAnalyticsClient {
       dictionary["additional_payment_methods"] = "applepay,fpx"
     }
 
-    var shippingFields: [String] = []
-    if let shippingAddressFields = configuration.requiredShippingAddressFields {
-      if shippingAddressFields.contains(.name) {
-        shippingFields.append("name")
-      }
-      if shippingAddressFields.contains(.emailAddress) {
-        shippingFields.append("email")
-      }
-      if shippingAddressFields.contains(.postalAddress) {
-        shippingFields.append("address")
-      }
-      if shippingAddressFields.contains(.phoneNumber) {
-        shippingFields.append("phone")
-      }
-    }
-
-    if shippingFields.isEmpty {
-      shippingFields.append("none")
-    }
-    dictionary["required_shipping_address_fields"] = shippingFields.joined(separator: "_")
-
-    switch configuration.shippingType {
-    case .shipping:
-      dictionary["shipping_type"] = "shipping"
-    case .delivery:
-      dictionary["shipping_type"] = "delivery"
-    }
-
     dictionary["company_name"] = configuration.companyName
     dictionary["apple_merchant_identifier"] = configuration.appleMerchantIdentifier ?? "unknown"
     return dictionary
