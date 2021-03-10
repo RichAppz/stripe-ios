@@ -86,11 +86,6 @@ public typealias STPPaymentMethodsCompletionBlock = ([STPPaymentMethod]?, Error?
 public typealias STPShippingMethodsCompletionBlock = (
   STPShippingStatus, Error?, [PKShippingMethod]?, PKShippingMethod?
 ) -> Void
-/// A callback to be run with a customer response from the Stripe API.
-/// - Parameters:
-///   - customer:     The Stripe customer from the response, or nil if an error occurred. - seealso: STPCustomer
-///   - error:        The error returned from the response, or nil if none occurs.
-public typealias STPCustomerCompletionBlock = (STPCustomer?, Error?) -> Void
 /// An enum representing the success and error states of PIN management
 @objc public enum STPPinStatus: Int {
   /// The verification object was already redeemed

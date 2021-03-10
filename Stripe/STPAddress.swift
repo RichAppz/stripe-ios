@@ -55,33 +55,6 @@ public class STPAddress: NSObject {
 
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
 
-  /// When creating a charge on your backend, you can attach shipping information
-  /// to prevent fraud on a physical good. You can use this method to turn your user's
-  /// shipping address and selected shipping method into a hash suitable for attaching
-  /// to a charge. You should pass this to your backend, and use it as the `shipping`
-  /// parameter when creating a charge.
-  /// - seealso: https://stripe.com/docs/api#create_charge-shipping
-  /// - Parameters:
-  ///   - address:  The user's shipping address. If nil, this method will return nil.
-  ///   - method:   The user's selected shipping method. May be nil.
-  @objc(shippingInfoForChargeWithAddress:shippingMethod:)
-  public class func shippingInfoForCharge(
-    with address: STPAddress?,
-    shippingMethod method: PKShippingMethod?
-  ) -> [AnyHashable: Any]? {
-    guard let address = address else {
-      return nil
-    }
-
-    var params: [AnyHashable: Any] = [:]
-    params["name"] = address.name
-    params["phone"] = address.phone
-    params["carrier"] = method?.label
-    // Re-use STPFormEncoder
-    params["address"] = STPFormEncoder.dictionary(forObject: address)
-    return params
-  }
-
   /// Initializes an empty STPAddress.
   @objc
   public override init() {
