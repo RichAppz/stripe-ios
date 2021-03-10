@@ -43,6 +43,8 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption {
   @objc public internal(set) var expYear = 0
   /// The cardholder's name.
   @objc public internal(set) var name: String?
+  /// The cardholder's address.
+  @objc public internal(set) var address: STPAddress?
   /// The issuer of the card.
   @objc public internal(set) var brand: STPCardBrand = .unknown
   /// The funding source for the card (credit, debit, prepaid, or other)
@@ -185,6 +187,7 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption {
       "isApplePayCard = \((isApplePayCard) ? "YES" : "NO")",
       // Cardholder details
       "name = \(((name) != nil ? "<redacted>" : nil) ?? "")",
+      "address = \(((address) != nil ? "<redacted>" : nil) ?? "")",
     ]
 
     return "<\(props.joined(separator: "; "))>"
@@ -219,6 +222,7 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption {
     }
 
     let card = self.init(stripeID: stripeId, last4: last4)
+    card.address = STPAddress()
 
     card.stripeID = stripeId
     card.name = dict.stp_string(forKey: "name")
@@ -232,6 +236,14 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption {
     card.currency = dict.stp_string(forKey: "currency")
     card.expMonth = dict.stp_int(forKey: "exp_month", or: 0)
     card.expYear = dict.stp_int(forKey: "exp_year", or: 0)
+
+    card.address?.name = card.name
+    card.address?.line1 = dict.stp_string(forKey: "address_line1")
+    card.address?.line2 = dict.stp_string(forKey: "address_line2")
+    card.address?.city = dict.stp_string(forKey: "address_city")
+    card.address?.state = dict.stp_string(forKey: "address_state")
+    card.address?.postalCode = dict.stp_string(forKey: "address_zip")
+    card.address?.country = dict.stp_string(forKey: "address_country")
 
     card.allResponseFields = response
     return card

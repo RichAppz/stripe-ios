@@ -71,11 +71,31 @@ extension STPAPIClient {
     return stripeError
   }
 
+  class func addressParams(from contact: PKContact?) -> [AnyHashable: Any]? {
+    guard let contact = contact else {
+      return nil
+    }
+    var params: [AnyHashable: Any] = [:]
+    let stpAddress = STPAddress(pkContact: contact)
+
+    params["name"] = stpAddress.name
+    params["address_line1"] = stpAddress.line1
+    params["address_city"] = stpAddress.city
+    params["address_state"] = stpAddress.state
+    params["address_zip"] = stpAddress.postalCode
+    params["address_country"] = stpAddress.country
+
+    return params
+  }
+
   @objc(parametersForPayment:)
   class func parameters(for payment: PKPayment) -> [String: Any] {
     let paymentString = String(data: payment.token.paymentData, encoding: .utf8)
     var payload: [String: Any] = [:]
     payload["pk_token"] = paymentString
+    if let billingContact = payment.billingContact {
+      payload["card"] = self.addressParams(from: billingContact)
+    }
 
     assert(
       !((paymentString?.count ?? 0) == 0

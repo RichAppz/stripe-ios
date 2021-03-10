@@ -9,6 +9,12 @@
 #import <XCTest/XCTest.h>
 #import <OCMock/OCMock.h>
 
+
+
+
+
+
+
 @interface STPPaymentConfigurationTest : XCTestCase
 
 @end
@@ -23,6 +29,9 @@
     STPPaymentConfiguration *paymentConfiguration = [[STPPaymentConfiguration alloc] init];
     
     XCTAssertFalse(paymentConfiguration.fpxEnabled);
+    XCTAssertNil(paymentConfiguration.requiredShippingAddressFields);
+    XCTAssert(paymentConfiguration.verifyPrefilledShippingAddress);
+    XCTAssertEqual(paymentConfiguration.shippingType, STPShippingTypeShipping);
     XCTAssertEqualObjects(paymentConfiguration.companyName, @"xctest");
     XCTAssertNil(paymentConfiguration.appleMerchantIdentifier);
     XCTAssert(paymentConfiguration.canDeletePaymentOptions);
@@ -75,6 +84,38 @@
 - (void)testDescription {
     STPPaymentConfiguration *paymentConfiguration = [[STPPaymentConfiguration alloc] init];
     XCTAssert(paymentConfiguration.description);
+}
+
+#pragma mark - NSCopying
+
+- (void)testCopyWithZone {
+    NSSet<STPContactField *> *allFields = [NSSet setWithArray:@[STPContactField.postalAddress,
+                                                              STPContactField.emailAddress,
+                                                              STPContactField.phoneNumber,
+                                                              STPContactField.name]];
+
+    STPPaymentConfiguration *paymentConfigurationA = [[STPPaymentConfiguration alloc] init];
+    paymentConfigurationA.applePayEnabled = YES;
+    paymentConfigurationA.requiredShippingAddressFields = allFields;
+    paymentConfigurationA.verifyPrefilledShippingAddress = NO;
+    paymentConfigurationA.availableCountries = [NSSet setWithArray:@[@"US", @"CA", @"BT"]];
+    paymentConfigurationA.shippingType = STPShippingTypeDelivery;
+    paymentConfigurationA.companyName = @"companyName";
+    paymentConfigurationA.appleMerchantIdentifier = @"appleMerchantIdentifier";
+    paymentConfigurationA.canDeletePaymentOptions = NO;
+    paymentConfigurationA.cardScanningEnabled = NO;
+
+    STPPaymentConfiguration *paymentConfigurationB = [paymentConfigurationA copy];
+    XCTAssertNotEqual(paymentConfigurationA, paymentConfigurationB);
+    XCTAssertTrue(paymentConfigurationB.applePayEnabled);
+    XCTAssertFalse(paymentConfigurationB.verifyPrefilledShippingAddress);
+    XCTAssertEqual(paymentConfigurationB.shippingType, STPShippingTypeDelivery);
+    XCTAssertEqualObjects(paymentConfigurationB.companyName, @"companyName");
+    XCTAssertEqualObjects(paymentConfigurationB.appleMerchantIdentifier, @"appleMerchantIdentifier");
+    NSSet *availableCountries = [NSSet setWithArray:@[@"US", @"CA", @"BT"]];
+    XCTAssertEqualObjects(paymentConfigurationB.availableCountries, availableCountries);
+    XCTAssertEqual(paymentConfigurationA.canDeletePaymentOptions, paymentConfigurationB.canDeletePaymentOptions);
+    XCTAssertEqual(paymentConfigurationA.cardScanningEnabled, paymentConfigurationB.cardScanningEnabled);
 }
 
 @end
