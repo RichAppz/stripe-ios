@@ -24,9 +24,6 @@ public enum STPBillingAddressFields: UInt {
   case full
   /// Just request the user's billing name
   case name
-  /// Just request the user's billing ZIP (synonym for STPBillingAddressFieldsZip)
-  @available(*, deprecated, message: "Use STPBillingAddressFields.postalCode instead")
-  case zip
 }
 
 /// STPAddress Contains an address as represented by the Stripe API.
@@ -298,8 +295,6 @@ public class STPAddress: NSObject {
       return Set<PKContactField>([.name, .postalAddress])
     case .name:
       return Set<PKContactField>([.name])
-    case .zip:
-      return Set()
     @unknown default:
       fatalError()
     }

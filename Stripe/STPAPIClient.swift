@@ -73,22 +73,6 @@ public class STPAPIClient: NSObject {
     self.publishableKey = publishableKey
   }
 
-  /// Initializes an API client with the given configuration.
-  /// - Parameter configuration: The configuration to use.
-  /// - Returns: An instance of STPAPIClient.
-  @available(
-    *, deprecated,
-    message:
-      "This initializer previously configured publishableKey and stripeAccount via the STPPaymentConfiguration instance. This behavior is deprecated; set the STPAPIClient configuration, publishableKey, and stripeAccount properties directly on the STPAPIClient instead."
-  )
-  @objc
-  public convenience init(configuration: STPPaymentConfiguration) {
-    // For legacy reasons, we'll support this initializer and use the deprecated configuration.{publishableKey, stripeAccount} properties
-    self.init()
-    publishableKey = configuration.publishableKey
-    stripeAccount = configuration.stripeAccount
-  }
-
   @objc(configuredRequestForURL:additionalHeaders:)
   func configuredRequest(for url: URL, additionalHeaders: [String: String] = [:])
     -> NSMutableURLRequest
@@ -273,28 +257,6 @@ extension STPAPIClient {
     ]
     STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
     createToken(withParameters: params, completion: completion)
-    STPTelemetryClient.shared.sendTelemetryData()
-  }
-}
-
-// MARK: Connect Accounts
-
-/// STPAPIClient extensions for working with Connect Accounts
-extension STPAPIClient {
-  /// Converts an `STPConnectAccountParams` object into a Stripe token using the Stripe API.
-  /// This allows the connected account to accept the Terms of Service, and/or send Legal Entity information.
-  /// - Parameters:
-  ///   - account: The Connect Account parameters. Cannot be nil.
-  ///   - completion: The callback to run with the returned Stripe token (and any errors that may have occurred).
-  @objc
-  public func createToken(
-    withConnectAccount account: STPConnectAccountParams, completion: STPTokenCompletionBlock?
-  ) {
-    var params = STPFormEncoder.dictionary(forObject: account)
-    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
-    if let completion = completion {
-      createToken(withParameters: params, completion: completion)
-    }
     STPTelemetryClient.shared.sendTelemetryData()
   }
 }

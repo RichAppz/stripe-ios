@@ -58,8 +58,6 @@ public class STPCardParams: NSObject, STPFormEncodable, NSCopying {
   /// to managed accounts. You should not set it otherwise. The card can then be
   /// used as a transfer destination for funds in this currency.
   @objc public var currency: String?
-  
-  // MARK: - Deprecated methods
 
   /// The first line of the cardholder's address
   @objc public var addressLine1: String? {

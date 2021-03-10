@@ -20,27 +20,10 @@ extern NSString *const STPTestJSONPaymentIntent;
 extern NSString *const STPTestJSONSetupIntent;
 extern NSString *const STPTestJSONPaymentMethodCard;
 extern NSString *const STPTestJSONPaymentMethodApplePay;
-extern NSString *const STPTestJSONPaymentMethodBacsDebit;
 
-extern NSString *const STPTestJSONSource3DS;
-extern NSString *const STPTestJSONSourceAlipay;
-extern NSString *const STPTestJSONSourceBancontact;
 extern NSString *const STPTestJSONSourceCard;
-extern NSString *const STPTestJSONSourceEPS;
-extern NSString *const STPTestJSONSourceGiropay;
-extern NSString *const STPTestJSONSourceiDEAL;
-extern NSString *const STPTestJSONSourceMultibanco;
-extern NSString *const STPTestJSONSourceP24;
-extern NSString *const STPTestJSONSourceSEPADebit;
-extern NSString *const STPTestJSONSourceSofort;
 
 @interface STPFixtures : NSObject
-
-/**
- An STPConnectAccountParams object with all of the fields filled in, and
- ToS accepted.
- */
-+ (STPConnectAccountParams *)accountParams;
 
 /**
  An Address object with all fields filled.
@@ -128,21 +111,6 @@ extern NSString *const STPTestJSONSourceSofort;
  */
 + (STPCustomer *)customerWithSourcesFromJSONKeys:(NSArray<NSString *> *)jsonSourceKeys
                                    defaultSource:(NSString *)jsonKeyForDefaultSource;
-
-/**
- A Source object with type iDEAL
- */
-+ (STPSource *)iDEALSource;
-
-/**
- A Source object with type Alipay
- */
-+ (STPSource *)alipaySource;
-    
-/**
- A Source object with type Alipay and a native redirect url
- */
-+ (STPSource *)alipaySourceWithNativeURL;
 
 /**
  A PaymentIntent object

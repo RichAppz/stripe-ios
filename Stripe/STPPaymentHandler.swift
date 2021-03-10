@@ -188,16 +188,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
       expand: ["payment_method"],
       completion: confirmCompletionBlock)
   }
-
-  /// :nodoc:
-  @available(*, deprecated, message: "Use confirmPayment(_:with:completion:) instead", renamed: "confirmPayment(_:with:completion:)")
-  public func confirmPayment(
-    withParams: STPPaymentIntentParams,
-    authenticationContext: STPAuthenticationContext,
-    completion: @escaping STPPaymentHandlerActionPaymentIntentCompletionBlock
-  ) {
-    self.confirmPayment(withParams, with: authenticationContext, completion: completion)
-  }
   
   /// Handles any `nextAction` required to authenticate the PaymentIntent.
   /// Call this method if you are using manual confirmation.  - seealso: https://stripe.com/docs/payments/payment-intents/ios
@@ -699,10 +689,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
     case .canceled:
       action.complete(with: STPPaymentHandlerActionStatus.canceled, error: nil)
 
-    case .requiresSource:
-      fatalError()
-    case .requiresSourceAction:
-      fatalError()
     }
     return false
   }
@@ -748,11 +734,6 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
               userInfo: [
                 "STPIntentAction": authenticationAction.description
               ]))
-
-        case .threeDS2Fingerprint:
-            break
-        case .threeDS2Redirect:
-            break
         @unknown default:
           fatalError()
         }
@@ -1001,56 +982,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
   // This is only called after web-redirects because native 3DS2 cancels go directly
   // to the ACS
   func _markChallengeCanceled(withCompletion completion: @escaping STPBooleanSuccessBlock) {
-    guard let currentAction = currentAction,
-      let nextAction = currentAction.nextAction()
-    else {
-      assert(false, "Calling _markChallengeCanceled without currentAction or nextAction.")
-      return
-    }
-
-    var threeDSSourceID: String?
-    switch nextAction.type {
-    case .redirectToURL:
-      threeDSSourceID = nextAction.redirectToURL?.threeDSSourceID
-    case .useStripeSDK:
-      threeDSSourceID = nextAction.useStripeSDK?.threeDSSourceID
-    case .unknown:
-      break
-    @unknown default:
-      fatalError()
-    }
-
-    guard let cancelSourceID = threeDSSourceID else {
-      // If there's no threeDSSourceID, there's nothing for us to cancel
-      completion(true, nil)
-      return
-    }
-
-    if let currentAction = self.currentAction as? STPPaymentHandlerPaymentIntentActionParams,
-      let paymentIntent = currentAction.paymentIntent
-    {
-
-      currentAction.apiClient.cancel3DSAuthentication(
-        forPaymentIntent: paymentIntent.stripeId,
-        withSource: cancelSourceID
-      ) { retrievedPaymentIntent, error in
-        currentAction.paymentIntent = retrievedPaymentIntent
-        completion(retrievedPaymentIntent != nil, error)
-      }
-    } else if let currentAction = self.currentAction as? STPPaymentHandlerSetupIntentActionParams,
-      let setupIntent = currentAction.setupIntent
-    {
-
-      currentAction.apiClient.cancel3DSAuthentication(
-        forSetupIntent: setupIntent.stripeID,
-        withSource: cancelSourceID
-      ) { retrievedSetupIntent, error in
-        currentAction.setupIntent = retrievedSetupIntent
-        completion(retrievedSetupIntent != nil, error)
-      }
-    } else {
-      assert(false, "currentAction is an unknown type or nil intent.")
-    }
+    completion(true, nil)
   }
 
   func _markChallengeCompleted(withCompletion completion: @escaping STPBooleanSuccessBlock) {

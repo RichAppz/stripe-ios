@@ -57,10 +57,6 @@
                                            XCTAssertNil(paymentIntent.paymentMethodId);
                                            XCTAssertEqual(paymentIntent.status, STPPaymentIntentStatusCanceled);
                                            XCTAssertEqual(paymentIntent.setupFutureUsage, STPPaymentIntentSetupFutureUsageNone);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-                                           XCTAssertNil(paymentIntent.nextSourceAction);
-#pragma clang diagnostic pop
                                            XCTAssertNil(paymentIntent.nextAction);
 
                                            [expectation fulfill];
@@ -165,15 +161,6 @@
                                     XCTAssertNotNil(paymentIntent.nextAction.redirectToURL.returnURL);
                                     XCTAssertEqualObjects(paymentIntent.nextAction.redirectToURL.returnURL,
                                                           [NSURL URLWithString:@"example-app-scheme://authorized"]);
-                                    
-                                    // Test deprecated property still works too
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-                                    XCTAssertNotNil(paymentIntent.nextSourceAction.authorizeWithURL.returnURL);
-                                    XCTAssertEqualObjects(paymentIntent.nextSourceAction.authorizeWithURL.returnURL,
-                                                          [NSURL URLWithString:@"example-app-scheme://authorized"]);
-#pragma clang diagnostic pop
-
                                     [expectation fulfill];
                                 }];
 

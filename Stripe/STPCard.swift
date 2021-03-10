@@ -98,41 +98,6 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption, STPSo
     }
   }
 
-  /// Create an STPCard from a Stripe API response.
-  /// - Parameters:
-  ///   - cardID:   The Stripe ID of the card, e.g. `card_185iQx4JYtv6MPZKfcuXwkOx`
-  ///   - brand:    The brand of the card (e.g. "Visa". To obtain this enum value
-  /// from a string, use `STPCardBrand.brand(from string:string)`;
-  ///   - last4:    The last 4 digits of the card, e.g. 4242
-  ///   - expMonth: The card's expiration month, 1-indexed (i.e. 1 = January)
-  ///   - expYear:  The card's expiration year
-  ///   - funding:  The card's funding type (credit, debit, or prepaid). To obtain
-  /// this enum value from a string, use `STPCardBrand.funding(from string:)`.
-  /// - Returns: an STPCard instance populated with the provided values.
-  @available(
-    *, deprecated,
-    message:
-      "You cannot directly instantiate an STPCard. You should only use one that has been returned from an STPAPIClient callback."
-  )
-  @objc(initWithID:brand:last4:expMonth:expYear:funding:)
-  public init(
-    id cardID: String,
-    brand: STPCardBrand,
-    last4: String,
-    expMonth: Int,
-    expYear: Int,
-    funding: STPCardFundingType
-  ) {
-    self.stripeID = cardID
-    self.brand = brand
-    self.last4 = last4
-    super.init()
-    self.expMonth = expMonth
-    self.expYear = expYear
-    self.funding = funding
-    address = STPAddress()
-  }
-
   /// This parses a string representing a card's funding type into the appropriate
   /// `STPCardFundingType` enum value,
   /// i.e. `STPCard.funding(from string:"prepaid") == .prepaid`.
@@ -292,51 +257,5 @@ public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption, STPSo
   @objc public var isReusable: Bool {
     return true
   }
-
-  // MARK: - Deprecated methods
-
-  /// A set of key/value pairs associated with the card object.
-  /// @deprecated Metadata is no longer returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead.
-  /// - seealso: https://stripe.com/docs/api#metadata
-  @available(
-    *, deprecated,
-    message:
-      "Metadata is no longer returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead."
-  )
-  @objc public private(set) var metadata: [String: String]?
-  /// The Stripe ID for the card.
-  @available(*, deprecated, message: "Use stripeID (defined in STPSourceProtocol)")
-  @objc public var cardId: String? {
-    return stripeID
-  }
-  /// The first line of the cardholder's address
-  @available(*, deprecated, message: "Use address.line1")
-  @objc public var addressLine1: String? {
-    return address?.line1
-  }
-  /// The second line of the cardholder's address
-  @available(*, deprecated, message: "Use address.line2")
-  @objc public var addressLine2: String? {
-    return address?.line2
-  }
-  /// The city of the cardholder's address
-  @available(*, deprecated, message: "Use address.city")
-  @objc public var addressCity: String? {
-    return address?.city
-  }
-  /// The state of the cardholder's address
-  @available(*, deprecated, message: "Use address.state")
-  @objc public var addressState: String? {
-    return address?.state
-  }
-  /// The zip code of the cardholder's address
-  @available(*, deprecated, message: "Use address.postalCode")
-  @objc public var addressZip: String? {
-    return address?.postalCode
-  }
-  /// The country of the cardholder's address
-  @available(*, deprecated, message: "Use address.country")
-  @objc public var addressCountry: String? {
-    return address?.country
-  }
+    
 }

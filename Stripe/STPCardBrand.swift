@@ -28,14 +28,6 @@ import Foundation
   case unknown
 }
 
-/// :nodoc:
-@available(
-  *, deprecated,
-  message: "STPStringFromCardBrand has been replaced with STPCardBrandUtilities.stringFrom(brand)"
-)
-@objc public class STPStringFromCardBrand: NSObject {
-}
-
 /// Contains `STPStringFromCardBrand`
 public class STPCardBrandUtilities: NSObject {
   /// Returns a string representation for the provided card brand;

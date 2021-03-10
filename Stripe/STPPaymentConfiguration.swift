@@ -86,60 +86,6 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
   /// https://github.com/stripe/stripe-ios/issues
   /// The default value is currently NO. This will be changed in a future update.
   @objc public var cardScanningEnabled = false
-  // MARK: - Deprecated
-
-  /// An enum value representing which payment options you will accept from your user
-  /// in addition to credit cards.
-  @available(
-    *, deprecated,
-    message:
-      "additionalPaymentOptions has been removed. Set applePayEnabled and fpxEnabled on STPPaymentConfiguration instead."
-  )
-  @objc public var additionalPaymentOptions: Int = 0
-
-  private var _publishableKey: String?
-  /// If you used STPPaymentConfiguration.shared.publishableKey, use STPAPIClient.shared.publishableKey instead.  The SDK uses STPAPIClient.shared to make API requests by default.
-  /// Your Stripe publishable key
-  /// - seealso: https://dashboard.stripe.com/account/apikeys
-  @available(*, deprecated, message: "If you used STPPaymentConfiguration.shared.publishableKey, use STPAPIClient.shared.publishableKey instead. If you passed a STPPaymentConfiguration instance to an SDK component, create an STPAPIClient, set publishableKey on it, and set the SDK component's APIClient property.")
-  @objc public var publishableKey: String? {
-    get {
-      if self == STPPaymentConfiguration.shared {
-        return STPAPIClient.shared.publishableKey
-      }
-      return _publishableKey ?? ""
-    }
-    set(publishableKey) {
-      if self == STPPaymentConfiguration.shared {
-        STPAPIClient.shared.publishableKey = publishableKey
-      } else {
-        _publishableKey = publishableKey
-      }
-    }
-  }
-
-  private var _stripeAccount: String?
-  /// If you used STPPaymentConfiguration.shared.stripeAccount, use STPAPIClient.shared.stripeAccount instead.  The SDK uses STPAPIClient.shared to make API requests by default.
-  /// In order to perform API requests on behalf of a connected account, e.g. to
-  /// create charges for a connected account, set this property to the ID of the
-  /// account for which this request is being made.
-  /// - seealso: https://stripe.com/docs/payments/payment-intents/use-cases#connected-accounts
-  @available(*, deprecated, message: "If you used STPPaymentConfiguration.shared.stripeAccount, use STPAPIClient.shared.stripeAccount instead. If you passed a STPPaymentConfiguration instance to an SDK component, create an STPAPIClient, set stripeAccount on it, and set the SDK component's APIClient property.")
-  @objc public var stripeAccount: String? {
-    get {
-      if self == STPPaymentConfiguration.shared {
-        return STPAPIClient.shared.stripeAccount
-      }
-      return _stripeAccount ?? ""
-    }
-    set(stripeAccount) {
-      if self == STPPaymentConfiguration.shared {
-        STPAPIClient.shared.stripeAccount = stripeAccount
-      } else {
-        _stripeAccount = stripeAccount
-      }
-    }
-  }
 
   // MARK: - Description
   /// :nodoc:
@@ -223,8 +169,6 @@ public class STPPaymentConfiguration: NSObject, NSCopying {
     copy.canDeletePaymentOptions = canDeletePaymentOptions
     copy.cardScanningEnabled = cardScanningEnabled
     copy.availableCountries = availableCountries
-    copy._publishableKey = _publishableKey
-    copy._stripeAccount = _stripeAccount
     return copy
   }
 }

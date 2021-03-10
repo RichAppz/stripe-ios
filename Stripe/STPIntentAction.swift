@@ -168,13 +168,3 @@ extension STPIntentAction: STPAPIResponseDecodable {
   }
 
 }
-
-// MARK: - Deprecated
-extension STPIntentAction {
-  /// The details for authorizing via URL, when `type == STPIntentActionTypeRedirectToURL`
-  /// @deprecated Use `redirectToURL` instead.
-  @available(*, deprecated, message: "Use `redirectToURL` instead.", renamed: "redirectToURL")
-  @objc public var authorizeWithURL: STPIntentActionRedirectToURL? {
-    return redirectToURL
-  }
-}

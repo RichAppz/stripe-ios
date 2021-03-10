@@ -73,18 +73,11 @@
                                    
                                    // Card
                                    XCTAssertEqual(paymentMethod.card.brand, STPCardBrandVisa);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-                                   XCTAssertEqual(paymentMethod.card.checks.cvcCheck, STPPaymentMethodCardCheckResultUnknown);
-                                   XCTAssertEqual(paymentMethod.card.checks.addressLine1Check, STPPaymentMethodCardCheckResultUnknown);
-                                   XCTAssertEqual(paymentMethod.card.checks.addressPostalCodeCheck, STPPaymentMethodCardCheckResultUnknown);
-#pragma clang diagnostic pop
                                    XCTAssertEqualObjects(paymentMethod.card.country, @"US");
                                    XCTAssertEqual(paymentMethod.card.expMonth, 10);
                                    XCTAssertEqual(paymentMethod.card.expYear, 2022);
                                    XCTAssertEqualObjects(paymentMethod.card.funding, @"credit");
                                    XCTAssertEqualObjects(paymentMethod.card.last4, @"4242");
-                                   XCTAssertTrue(paymentMethod.card.threeDSecureUsage.supported);
                                    [expectation fulfill];
                                }];
 

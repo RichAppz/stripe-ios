@@ -46,31 +46,6 @@ class STPCardTest: XCTestCase {
 
   // MARK: - STPCardFundingType Tests
 
-  //#pragma clang diagnostic push
-  //#pragma clang diagnostic ignored "-Wdeprecated"
-  // These are only intended to be deprecated publicly.
-  // When removed from public header, can remove these pragmas
-  func testFundingFromString() {
-    XCTAssertEqual(STPCard.funding(from: "credit"), .credit)
-    XCTAssertEqual(STPCard.funding(from: "CREDIT"), .credit)
-
-    XCTAssertEqual(STPCard.funding(from: "debit"), .debit)
-    XCTAssertEqual(STPCard.funding(from: "DEBIT"), .debit)
-
-    XCTAssertEqual(STPCard.funding(from: "prepaid"), .prepaid)
-    XCTAssertEqual(STPCard.funding(from: "PREPAID"), .prepaid)
-
-    XCTAssertEqual(STPCard.funding(from: "other"), .other)
-    XCTAssertEqual(STPCard.funding(from: "OTHER"), .other)
-
-    XCTAssertEqual(STPCard.funding(from: "unknown"), .other)
-    XCTAssertEqual(STPCard.funding(from: "UNKNOWN"), .other)
-
-    XCTAssertEqual(STPCard.funding(from: "garbage"), .other)
-    XCTAssertEqual(STPCard.funding(from: "GARBAGE"), .other)
-  }
-
-  //#pragma clang diagnostic pop
   func testStringFromFunding() {
     let values: [STPCardFundingType] = [
       .credit,
@@ -95,27 +70,6 @@ class STPCardTest: XCTestCase {
         break
       }
     }
-  }
-
-  // MARK: -
-  //#pragma clang diagnostic push
-  //#pragma clang diagnostic ignored "-Wdeprecated"
-  // These tests can ber removed in the future, they should be covered by
-  // the equivalent response decodeable tests
-  func testInitWithIDBrandLast4ExpMonthExpYearFunding() {
-    let card = STPCard(
-      id: "card_1AVRojEOD54MuFwSxr93QJSx",
-      brand: .visa,
-      last4: "5556",
-      expMonth: 12,
-      expYear: 2034,
-      funding: .debit)
-    XCTAssertEqual(card.stripeID, "card_1AVRojEOD54MuFwSxr93QJSx")
-    XCTAssertEqual(card.brand, .visa)
-    XCTAssertEqual(card.last4, "5556")
-    XCTAssertEqual(card.expMonth, Int(12))
-    XCTAssertEqual(card.expYear, Int(2034))
-    XCTAssertEqual(card.funding, .debit)
   }
 
   //#pragma clang diagnostic pop
@@ -197,22 +151,6 @@ class STPCardTest: XCTestCase {
     XCTAssertEqual(card.address?.line2, "Apt 1")
     XCTAssertEqual(card.address?.state, "PA")
     XCTAssertEqual(card.address?.postalCode, "19219")
-
-    //#pragma clang diagnostic push
-    //#pragma clang diagnostic ignored "-Wdeprecated"
-
-    XCTAssertEqual(card.cardId, "card_103kbR2eZvKYlo2CDczLmw4K")
-
-    XCTAssertEqual(card.addressCity, "Pittsburgh")
-    XCTAssertEqual(card.addressCountry, "US")
-    XCTAssertEqual(card.addressLine1, "123 Fake St")
-    XCTAssertEqual(card.addressLine2, "Apt 1")
-    XCTAssertEqual(card.addressState, "PA")
-    XCTAssertEqual(card.addressZip, "19219")
-    XCTAssertNil(card.metadata)
-
-    //#pragma clang diagnostic pop
-
     XCTAssertEqual(card.brand, .visa)
     XCTAssertEqual(card.country, "US")
     XCTAssertEqual(card.currency, "usd")

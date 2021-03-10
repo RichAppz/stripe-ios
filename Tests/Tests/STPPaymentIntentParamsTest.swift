@@ -24,10 +24,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
       XCTAssertNil(params.sourceParams)
       XCTAssertNil(params.sourceId)
       XCTAssertNil(params.receiptEmail)
-      //#pragma clang diagnostic push
-      //#pragma clang diagnostic ignored "-Wdeprecated"
-      XCTAssertNil(params.saveSourceToCustomer)
-      //#pragma clang diagnostic pop
       XCTAssertNil(params.savePaymentMethod)
       XCTAssertNil(params.returnURL)
       XCTAssertNil(params.setupFutureUsage)
@@ -42,51 +38,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
     let params = STPPaymentIntentParams()
     XCTAssertNotNil(params.description)
   }
-
-  // MARK: Deprecated Property
-
-  //#pragma clang diagnostic push
-  //#pragma clang diagnostic ignored "-Wdeprecated"
-  func testReturnURLRenaming() {
-    let params = STPPaymentIntentParams()
-
-    XCTAssertNil(params.returnURL)
-    XCTAssertNil(params.returnUrl)
-
-    params.returnURL = "set via new name"
-    XCTAssertEqual(params.returnUrl, "set via new name")
-
-    params.returnUrl = "set via old name"
-    XCTAssertEqual(params.returnURL, "set via old name")
-  }
-
-  func testSaveSourceToCustomerRenaming() {
-    let params = STPPaymentIntentParams()
-
-    XCTAssertNil(params.saveSourceToCustomer)
-    XCTAssertNil(params.savePaymentMethod)
-
-    params.savePaymentMethod = NSNumber(value: false)
-    XCTAssertEqual(params.saveSourceToCustomer, NSNumber(value: false))
-
-    params.saveSourceToCustomer = NSNumber(value: true)
-    XCTAssertEqual(params.savePaymentMethod, NSNumber(value: true))
-  }
-
-  func testDefaultMandateData() {
-    let params = STPPaymentIntentParams()
-
-    // no configuration should have no mandateData
-    XCTAssertNil(params.mandateData)
-
-    params.paymentMethodParams = STPPaymentMethodParams()
-
-    params.paymentMethodParams!.rawTypeString = "card"
-    // card type should have no default mandateData
-    XCTAssertNil(params.mandateData)
-  }
-
-  //#pragma clang diagnostic pop
 
   // MARK: STPFormEncodable Tests
   func testRootObjectName() {

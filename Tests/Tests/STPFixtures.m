@@ -18,29 +18,11 @@ NSString *const STPTestJSONSetupIntent = @"SetupIntent";
 
 NSString *const STPTestJSONPaymentMethodCard = @"CardPaymentMethod";
 NSString *const STPTestJSONPaymentMethodApplePay = @"ApplePayPaymentMethod";
-NSString *const STPTestJSONPaymentMethodBacsDebit = @"BacsDebitPaymentMethod";
 
-NSString *const STPTestJSONSource3DS = @"3DSSource";
-NSString *const STPTestJSONSourceAlipay = @"AlipaySource";
-NSString *const STPTestJSONSourceBancontact = @"BancontactSource";
 NSString *const STPTestJSONSourceCard = @"CardSource";
-NSString *const STPTestJSONSourceEPS = @"EPSSource";
-NSString *const STPTestJSONSourceGiropay = @"GiropaySource";
-NSString *const STPTestJSONSourceiDEAL = @"iDEALSource";
-NSString *const STPTestJSONSourceMultibanco = @"MultibancoSource";
-NSString *const STPTestJSONSourceP24 = @"P24Source";
-NSString *const STPTestJSONSourceSEPADebit = @"SEPADebitSource";
-NSString *const STPTestJSONSourceSofort = @"SofortSource";
-NSString *const STPTestJSONSourceWeChatPay = @"WeChatPaySource";
 
 
 @implementation STPFixtures
-
-+ (STPConnectAccountParams *)accountParams {
-    STPConnectAccountIndividualParams *params = [STPConnectAccountIndividualParams new];
-    return [[STPConnectAccountParams alloc] initWithTosShownAndAccepted:YES
-                                                             individual:params];
-}
 
 + (STPAddress *)address {
     STPAddress *address = [STPAddress new];
@@ -195,22 +177,6 @@ NSString *const STPTestJSONSourceWeChatPay = @"WeChatPaySource";
     customer[@"sources"] = sources;
 
     return [STPCustomer decodedObjectFromAPIResponse:customer];
-}
-
-+ (STPSource *)iDEALSource {
-    return [STPSource decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:STPTestJSONSourceiDEAL]];
-}
-
-+ (STPSource *)alipaySource {
-    return [STPSource decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:STPTestJSONSourceAlipay]];
-}
-
-+ (STPSource *)alipaySourceWithNativeURL {
-    NSMutableDictionary *dictionary = [STPTestUtils jsonNamed:STPTestJSONSourceAlipay].mutableCopy;
-    NSMutableDictionary *detailsDictionary = ((NSDictionary *)dictionary[@"alipay"]).mutableCopy;
-    detailsDictionary[@"native_url"] = @"alipay://test";
-    dictionary[@"alipay"] = detailsDictionary;
-    return [STPSource decodedObjectFromAPIResponse:dictionary];
 }
 
 + (STPPaymentIntent *)paymentIntent {

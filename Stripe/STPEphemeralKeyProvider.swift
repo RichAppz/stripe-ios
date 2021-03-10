@@ -53,17 +53,3 @@ import Foundation
   @objc(createIssuingCardKeyWithAPIVersion:completion:) func createIssuingCardKey(
     withAPIVersion apiVersion: String, completion: @escaping STPJSONResponseCompletionBlock)
 }
-
-/// You should make your application's API client conform to this interface.
-/// It provides a way for Stripe utility classes to request a new ephemeral key from
-/// your backend, which it will use to retrieve and update Stripe API objects.
-/// @deprecated use `STPCustomerEphemeralKeyProvider` or `STPIssuingCardEphemeralKeyProvider`
-/// depending on the type of key that will@objc  be fetched.
-
-@available(
-  *, deprecated,
-  message:
-    "use `STPCustomerEphemeralKeyProvider` or `STPIssuingCardEphemeralKeyProvider` depending on the type of key that will be fetched."
-)
-@objc public protocol STPEphemeralKeyProvider: STPCustomerEphemeralKeyProvider {
-}

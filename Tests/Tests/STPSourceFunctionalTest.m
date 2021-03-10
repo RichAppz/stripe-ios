@@ -39,10 +39,6 @@
         XCTAssertEqual(source.redirect.status, STPSourceRedirectStatusPending);
         XCTAssertEqualObjects(source.redirect.returnURL, [NSURL URLWithString:@"https://shop.example.com/crtABC?redirect_merchant_name=xctest"]);
         XCTAssertNotNil(source.redirect.url);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-        XCTAssertNil(source.metadata, @"Metadata is not returned.");
-#pragma clang diagnostic pop
 
         [expectation fulfill];
     }];
@@ -82,10 +78,6 @@
         XCTAssertEqualObjects(address.state, card.address.state);
         XCTAssertEqualObjects(address.country, card.address.country);
         XCTAssertEqualObjects(address.postalCode, card.address.postalCode);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-        XCTAssertNil(source.metadata, @"Metadata is not returned.");
-#pragma clang diagnostic pop
 
         [expectation fulfill];
     }];
@@ -160,10 +152,6 @@
         XCTAssertEqual(source.redirect.status, STPSourceRedirectStatusPending);
         XCTAssertEqualObjects(source.redirect.returnURL, [NSURL URLWithString:@"https://shop.example.com/crtABC?redirect_merchant_name=xctest"]);
         XCTAssertNotNil(source.redirect.url);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-        XCTAssertNil(source.metadata, @"Metadata is not returned.");
-#pragma clang diagnostic pop
 
         [expectation fulfill];
     }];

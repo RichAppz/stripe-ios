@@ -53,17 +53,6 @@ public class STPSource: NSObject, STPAPIResponseDecodable, STPSourceProtocol, ST
   /// If this is a card source, this property provides typed access to the
   /// contents of the `details` dictionary.
   @objc public private(set) var cardDetails: STPSourceCardDetails?
-  // MARK: - Deprecated
-
-  /// A set of key/value pairs associated with the source object.
-  /// @deprecated Metadata is no longer returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead.
-  /// - seealso: https://stripe.com/docs/api#metadata
-  @available(
-    *, deprecated,
-    message:
-      "Metadata is no longer returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead."
-  )
-  @objc public private(set) var metadata: [String: String]?
   @objc public var stripeID = ""
   @objc private(set) public var allResponseFields: [AnyHashable: Any] = [:]
 

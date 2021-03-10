@@ -51,26 +51,6 @@ public class STPBankAccount: NSObject, STPAPIResponseDecodable, STPSourceProtoco
   @objc public private(set) var fingerprint: String?
   /// The validation status of the bank account. - seealso: STPBankAccountStatus
   @objc public private(set) var status: STPBankAccountStatus = .new
-  
-  // MARK: - Deprecated methods
-
-  /// A set of key/value pairs associated with the bank account object.
-  /// @deprecated Metadata is no longer returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead.
-  /// - seealso: https://stripe.com/docs/api#metadata
-  @available(
-    *, deprecated,
-    message:
-      "Metadata is no longer returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead."
-  )
-  private(set) var metadata: [String: String]?
-  /// The Stripe ID for the bank account.
-  @available(
-    *, deprecated,
-    message: "Use stripeID (defined in STPSourceProtocol)"
-  )
-  @objc public var bankAccountId: String? {
-    return stripeID
-  }
   @objc public private(set) var stripeID: String = ""
   @objc public private(set) var allResponseFields: [AnyHashable: Any] = [:]
 

@@ -35,17 +35,6 @@ public class STPSetupIntent: NSObject, STPAPIResponseDecodable {
   @objc public private(set) var usage: STPSetupIntentUsage = .unknown
   /// The setup error encountered in the previous SetupIntent confirmation.
   @objc public private(set) var lastSetupError: STPSetupIntentLastSetupError?
-  // MARK: - Deprecated
-
-  /// Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
-  /// @deprecated Metadata is not  returned to clients using publishable keys. Retrieve them on your server using yoursecret key instead.
-  /// - seealso: https://stripe.com/docs/api#metadata
-  @available(
-    *, deprecated,
-    message:
-      "Metadata is not returned to clients using publishable keys. Retrieve them on your server using your secret key instead."
-  )
-  @objc public private(set) var metadata: [String: String]?
   @objc public private(set) var allResponseFields: [AnyHashable: Any] = [:]
 
   override required init() {

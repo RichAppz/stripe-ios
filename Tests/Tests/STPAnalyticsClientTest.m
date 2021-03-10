@@ -35,10 +35,6 @@
     NSDictionary *cardDict = [self buildTokenParams:card];
     XCTAssertEqualObjects([STPAnalyticsClient tokenTypeFromParameters:cardDict], @"card");
 
-    STPConnectAccountParams *account = [STPFixtures accountParams];
-    NSDictionary *accountDict = [self buildTokenParams:account];
-    XCTAssertEqualObjects([STPAnalyticsClient tokenTypeFromParameters:accountDict], @"account");
-
     STPBankAccountParams *bank = [STPFixtures bankAccountParams];
     NSDictionary *bankDict = [self buildTokenParams:bank];
     XCTAssertEqualObjects([STPAnalyticsClient tokenTypeFromParameters:bankDict], @"bank_account");
@@ -50,28 +46,9 @@
 
 #pragma mark - Tests various classes report usage
 
-- (id)mockKeyProvider {
-    id mockKeyProvider = OCMProtocolMock(@protocol(STPEphemeralKeyProvider));
-    OCMStub([mockKeyProvider createCustomerKeyWithAPIVersion:[OCMArg isEqual:@"1"]
-                                                  completion:[OCMArg any]])
-    .andDo(^(NSInvocation *invocation) {
-        __unsafe_unretained STPJSONResponseCompletionBlock completion;
-        [invocation getArgument:&completion atIndex:3];
-        completion(nil, [NSError stp_genericConnectionError]);
-    });
-    return mockKeyProvider;
-}
-
 - (void)testApplePayContextAddsUsage{
     id delegate;
     STPApplePayContext *_ = [[STPApplePayContext alloc] initWithPaymentRequest:[STPFixtures applePayRequest] delegate:delegate];
-    XCTAssertTrue([[STPAnalyticsClient sharedClient].productUsage containsObject:NSStringFromClass([_ class])]);
-}
-
-- (void)testCustomerContextAddsUsage {
-    STPEphemeralKeyManager *keyManager = [[STPEphemeralKeyManager alloc] initWithKeyProvider:[self mockKeyProvider] apiVersion:@"1" performsEagerFetching:NO];
-    STPAPIClient *apiClient = [STPAPIClient new];
-    STPCustomerContext *_ = [[STPCustomerContext alloc] initWithKeyManager:keyManager apiClient:apiClient];
     XCTAssertTrue([[STPAnalyticsClient sharedClient].productUsage containsObject:NSStringFromClass([_ class])]);
 }
 

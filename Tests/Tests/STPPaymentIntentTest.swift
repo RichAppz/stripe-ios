@@ -68,16 +68,6 @@ class STPPaymentIntentTest: XCTestCase {
     XCTAssertFalse(paymentIntent.livemode)
     XCTAssertEqual(paymentIntent.receiptEmail, "danj@example.com")
 
-    // Deprecated: `nextSourceAction` & `authorizeWithURL` should just be aliases for `nextAction` & `redirectToURL`
-    //#pragma clang diagnostic push
-    //#pragma clang diagnostic ignored "-Wdeprecated"
-    XCTAssertEqual(
-      paymentIntent.nextAction, paymentIntent.nextAction, "Should be the same object.")
-    XCTAssertEqual(
-      paymentIntent.nextAction!.redirectToURL!, paymentIntent.nextAction!.redirectToURL,
-      "Should be the same object.")
-    //#pragma clang diagnostic pop
-
     // nextAction
     XCTAssertNotNil(paymentIntent.nextAction)
     XCTAssertEqual(paymentIntent.nextAction!.type, .redirectToURL)

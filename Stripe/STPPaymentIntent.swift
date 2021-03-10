@@ -260,18 +260,6 @@ extension STPPaymentIntent: STPAPIResponseDecodable {
   }
 }
 
-// MARK: - Deprecated
-extension STPPaymentIntent {
-
-  /// If `status == STPPaymentIntentStatusRequiresAction`, this
-  /// property contains the next source action to take for this PaymentIntent.
-  /// @deprecated Use nextAction instead
-  @available(*, deprecated, message: "Use nextAction instead", renamed: "nextAction")
-  @objc public var nextSourceAction: STPIntentAction? {
-    return nextAction
-  }
-}
-
 // MARK: - Internal
 extension STPPaymentIntent {
 

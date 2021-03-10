@@ -21,8 +21,6 @@ public class STPIntentActionRedirectToURL: NSObject {
 
   @objc public let allResponseFields: [AnyHashable: Any]
 
-  let threeDSSourceID: String?
-
   /// :nodoc:
   @objc public override var description: String {
     let props: [String] = [
@@ -39,12 +37,10 @@ public class STPIntentActionRedirectToURL: NSObject {
   init(
     url: URL,
     returnURL: URL?,
-    threeDSSourceID: String?,
     allResponseFields: [AnyHashable: Any]
   ) {
     self.url = url
     self.returnURL = returnURL
-    self.threeDSSourceID = threeDSSourceID
     self.allResponseFields = allResponseFields
     super.init()
   }
@@ -72,7 +68,6 @@ extension STPIntentActionRedirectToURL: STPAPIResponseDecodable {
     return STPIntentActionRedirectToURL(
       url: url,
       returnURL: returnURL,
-      threeDSSourceID: url.lastPathComponent.hasPrefix("src_") ? url.lastPathComponent : nil,
       allResponseFields: dict) as? Self
   }
 }

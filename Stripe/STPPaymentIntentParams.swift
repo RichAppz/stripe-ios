@@ -115,32 +115,6 @@ public class STPPaymentIntentParams: NSObject {
   /// Shipping information.
   @objc public var shipping: STPPaymentIntentShippingDetailsParams?
 
-  /// The URL to redirect your customer back to after they authenticate or cancel
-  /// their payment on the payment method’s app or site.
-  /// This property has been renamed to `returnURL` and deprecated.
-  @available(*, deprecated, renamed: "returnURL")
-  @objc public var returnUrl: String? {
-    get {
-      return returnURL
-    }
-    set(returnUrl) {
-      returnURL = returnUrl
-    }
-  }
-  /// `@YES` to save this PaymentIntent’s Source to the associated Customer,
-  /// if the Source is not already attached.
-  /// This should be a boolean NSNumber, so that it can be `nil`
-  /// This property has been renamed to `savePaymentMethod` and deprecated.
-  @available(*, deprecated, renamed: "savePaymentMethod")
-  @objc public var saveSourceToCustomer: NSNumber? {
-    get {
-      return savePaymentMethod
-    }
-    set(saveSourceToCustomer) {
-      savePaymentMethod = saveSourceToCustomer
-    }
-  }
-
   /// :nodoc:
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
 
