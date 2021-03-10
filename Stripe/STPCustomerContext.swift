@@ -188,39 +188,6 @@ open class STPCustomerContext: NSObject, STPBackendAPIAdapter {
     })
   }
 
-  @objc
-  public func updateCustomer(
-    withShippingAddress shipping: STPAddress, completion: STPErrorBlock?
-  ) {
-    keyManager.getOrCreateKey({ ephemeralKey, retrieveKeyError in
-      guard let ephemeralKey = ephemeralKey, retrieveKeyError == nil else {
-        if let completion = completion {
-          stpDispatchToMainThreadIfNecessary({
-            completion(retrieveKeyError)
-          })
-        }
-        return
-      }
-      var params: [String: Any] = [:]
-      params["shipping"] = STPAddress.shippingInfoForCharge(
-        with: shipping,
-        shippingMethod: nil)
-      self.apiClient.updateCustomer(
-        withParameters: params,
-        using: ephemeralKey
-      ) { customer, error in
-        if let customer = customer {
-          self.customer = customer
-        }
-        if let completion = completion {
-          stpDispatchToMainThreadIfNecessary({
-            completion(error)
-          })
-        }
-      }
-    })
-  }
-
   /// A convenience method for attaching the PaymentMethod to the current Customer
   @objc
   public func attachPaymentMethodToCustomer(

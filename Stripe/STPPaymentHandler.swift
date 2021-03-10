@@ -470,9 +470,7 @@ public class STPPaymentHandler: NSObject, SFSafariViewControllerDelegate, STPURL
   class func _isProcessingIntentSuccess(for type: STPPaymentMethodType) -> Bool {
     switch type {
     /* Synchronous */
-    case
-      .card,
-      .cardPresent:
+    case .card:
       return false
 
     case .unknown:

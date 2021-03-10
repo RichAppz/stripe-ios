@@ -23,12 +23,6 @@
     card.expMonth = 6;
     card.expYear = 2024;
     card.currency = @"usd";
-    card.address.line1 = @"123 Fake Street";
-    card.address.line2 = @"Apartment 4";
-    card.address.city = @"New York";
-    card.address.state = @"NY";
-    card.address.country = @"USA";
-    card.address.postalCode = @"10002";
 
     STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:STPTestingDefaultPublishableKey];
 
@@ -47,7 +41,6 @@
                          XCTAssertEqual(2024U, token.card.expYear);
                          XCTAssertEqualObjects(@"4242", token.card.last4);
                          XCTAssertEqualObjects(@"usd", token.card.currency);
-                         XCTAssertEqualObjects(@"10002", token.card.address.postalCode);
                      }];
     [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
 }

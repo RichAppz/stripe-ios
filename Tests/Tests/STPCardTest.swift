@@ -102,17 +102,6 @@ class STPCardTest: XCTestCase {
     // See: https://stripe.com/docs/api#card_object-tokenization_method
   }
 
-  func testAddressPopulated() {
-    let card = STPFixtures.card()
-    XCTAssertEqual(card.address?.name, "Jane Austen")
-    XCTAssertEqual(card.address?.line1, "123 Fake St")
-    XCTAssertEqual(card.address?.line2, "Apt 1")
-    XCTAssertEqual(card.address?.city, "Pittsburgh")
-    XCTAssertEqual(card.address?.state, "PA")
-    XCTAssertEqual(card.address?.postalCode, "19219")
-    XCTAssertEqual(card.address?.country, "US")
-  }
-
   // MARK: - Equality Tests
   func testCardEquals() {
     let card1 = STPFixtures.card()
@@ -144,13 +133,6 @@ class STPCardTest: XCTestCase {
     let card = STPCard.decodedObject(fromAPIResponse: response)!
 
     XCTAssertEqual(card.stripeID, "card_103kbR2eZvKYlo2CDczLmw4K")
-
-    XCTAssertEqual(card.address?.city, "Pittsburgh")
-    XCTAssertEqual(card.address?.country, "US")
-    XCTAssertEqual(card.address?.line1, "123 Fake St")
-    XCTAssertEqual(card.address?.line2, "Apt 1")
-    XCTAssertEqual(card.address?.state, "PA")
-    XCTAssertEqual(card.address?.postalCode, "19219")
     XCTAssertEqual(card.brand, .visa)
     XCTAssertEqual(card.country, "US")
     XCTAssertEqual(card.currency, "usd")

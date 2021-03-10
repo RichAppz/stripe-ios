@@ -63,8 +63,7 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
     self.init()
     switch paymentMethod.type {
     // All reusable PaymentMethods go below:
-    case .card, .cardPresent,  // fall through
-      .unknown:
+    case .card, .unknown:
       return nil
     default:
       break
@@ -95,7 +94,7 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
       } else {
         return STPCardBrandUtilities.stringFrom(.unknown) ?? ""
       }
-    case .cardPresent, .unknown:
+    case .unknown:
       return STPLocalizedString("Unknown", "Default missing source type label")
     @unknown default:
       return STPLocalizedString("Unknown", "Default missing source type label")
@@ -106,7 +105,7 @@ public class STPPaymentMethodParams: NSObject, STPFormEncodable, STPPaymentOptio
     switch type {
     case .card:
       return true
-    case .cardPresent, .unknown:
+    case .unknown:
       return false
     @unknown default:
       return false

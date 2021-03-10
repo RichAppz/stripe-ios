@@ -16,9 +16,6 @@ public class STPCustomer: NSObject {
   /// The Stripe ID of the customer, e.g. `cus_1234`
   @objc public let stripeID: String
 
-  /// The customer's shipping address.
-  @objc public var shippingAddress: STPAddress?
-
   @objc public let allResponseFields: [AnyHashable: Any]
 
   /// Initialize a customer object with the provided values.
@@ -33,17 +30,14 @@ public class STPCustomer: NSObject {
   ) {
     self.init(
       stripeID: stripeID,
-      shippingAddress: nil,
       allResponseFields: [:])
   }
 
   internal init(
     stripeID: String,
-    shippingAddress: STPAddress?,
     allResponseFields: [AnyHashable: Any]
   ) {
     self.stripeID = stripeID
-    self.shippingAddress = shippingAddress
     self.allResponseFields = allResponseFields
     super.init()
   }
@@ -51,7 +45,6 @@ public class STPCustomer: NSObject {
   convenience override init() {
     self.init(
       stripeID: "",
-      shippingAddress: nil,
       allResponseFields: [:])
   }
 
@@ -78,22 +71,8 @@ extension STPCustomer: STPAPIResponseDecodable {
       return nil
     }
 
-    let shippingAddress: STPAddress?
-
-    if let shippingDict = dict["shipping"] as? [AnyHashable: Any],
-      let addressDict = shippingDict["address"] as? [AnyHashable: Any],
-      let shipping = STPAddress.decodedObject(fromAPIResponse: addressDict)
-    {
-      shipping.name = shippingDict["name"] as? String
-      shipping.phone = shippingDict["phone"] as? String
-      shippingAddress = shipping
-    } else {
-      shippingAddress = nil
-    }
-
     return STPCustomer(
       stripeID: stripeID,
-      shippingAddress: shippingAddress,
       allResponseFields: dict) as? Self
 
   }
