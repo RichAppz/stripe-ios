@@ -110,7 +110,6 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Intent confirm"];
 
     STPPaymentIntentParams *params = [[STPPaymentIntentParams alloc] initWithClientSecret:@"pi_1GGCGfFY0qyl6XeWbSAsh2hn_secret_jbhwsI0DGWhKreJs3CCrluUGe"];
-    params.sourceParams = [self cardSourceParams];
     [client confirmPaymentIntentWithParams:params
                                 completion:^(STPPaymentIntent * _Nullable paymentIntent, NSError * _Nullable error) {
                                     XCTAssertNil(paymentIntent);
@@ -118,52 +117,9 @@
                                     XCTAssertNotNil(error);
                                     XCTAssertEqualObjects(error.domain, [STPError stripeDomain]);
                                     XCTAssertEqual(error.code, STPInvalidRequestError);
-                                    XCTAssertTrue([error.userInfo[[STPError errorMessageKey]] hasPrefix:@"This PaymentIntent's source could not be updated because it has a status of canceled. You may only update the source of a PaymentIntent with one of the following statuses: requires_payment_method, requires_confirmation, requires_action."],
-                                                  @"Expected error message to complain about status being canceled. Actual msg: `%@`", error.userInfo[[STPError errorMessageKey]]);
 
                                     [expectation fulfill];
                                 }];
-    [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
-}
-
-- (void)testConfirmPaymentIntentWith3DSCardSucceeds {
-
-    __block NSString *clientSecret = nil;
-    XCTestExpectation *createExpectation = [self expectationWithDescription:@"Create PaymentIntent."];
-    [[STPTestingAPIClient sharedClient] createPaymentIntentWithParams:nil completion:^(NSString * _Nullable createdClientSecret, NSError * _Nullable creationError) {
-        XCTAssertNotNil(createdClientSecret);
-        XCTAssertNil(creationError);
-        [createExpectation fulfill];
-        clientSecret = [createdClientSecret copy];
-    }];
-    [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
-    XCTAssertNotNil(clientSecret);
-
-    STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:STPTestingDefaultPublishableKey];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Intent confirm"];
-
-    STPPaymentIntentParams *params = [[STPPaymentIntentParams alloc] initWithClientSecret:clientSecret];
-    params.sourceParams = [self cardSourceParams];
-    // returnURL must be passed in while confirming (not creation time)
-    params.returnURL = @"example-app-scheme://authorized";
-    [client confirmPaymentIntentWithParams:params
-                                completion:^(STPPaymentIntent * _Nullable paymentIntent, NSError * _Nullable error) {
-                                    XCTAssertNil(error, @"With valid key + secret, should be able to confirm the intent");
-
-                                    XCTAssertNotNil(paymentIntent);
-                                    XCTAssertEqualObjects(paymentIntent.stripeId, params.stripeId);
-                                    XCTAssertFalse(paymentIntent.livemode);
-
-                                    // sourceParams is the 3DS-required test card
-                                    XCTAssertEqual(paymentIntent.status, STPPaymentIntentStatusRequiresAction);
-
-                                    // STPRedirectContext is relying on receiving returnURL
-                                    XCTAssertNotNil(paymentIntent.nextAction.redirectToURL.returnURL);
-                                    XCTAssertEqualObjects(paymentIntent.nextAction.redirectToURL.returnURL,
-                                                          [NSURL URLWithString:@"example-app-scheme://authorized"]);
-                                    [expectation fulfill];
-                                }];
-
     [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
 }
 
@@ -394,18 +350,6 @@
   STPPaymentIntentParams *params = [[STPPaymentIntentParams alloc] init];
   params.setupFutureUsage = @(STPPaymentIntentSetupFutureUsageOnSession);
   XCTAssertEqualObjects(params.setupFutureUsageRawString, @"on_session");
-}
-
-#pragma mark - Helpers
-
-- (STPSourceParams *)cardSourceParams {
-    STPCardParams *card = [[STPCardParams alloc] init];
-    card.number = @"4000 0000 0000 3063"; // Test 3DS required card
-    card.expMonth = 7;
-    card.expYear = [[NSCalendar currentCalendar] component:NSCalendarUnitYear fromDate:[NSDate date]] + 5;
-    card.currency = @"usd";
-
-    return [STPSourceParams cardParamsWithCard:card];
 }
 
 @end

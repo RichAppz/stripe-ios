@@ -25,7 +25,7 @@ public enum STPCardFundingType: Int {
 /// Representation of a user's credit card details that have been tokenized with
 /// the Stripe API
 /// - seealso: https://stripe.com/docs/api#cards
-public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption, STPSourceProtocol {
+public class STPCard: NSObject, STPAPIResponseDecodable, STPPaymentOption {
   /// The last 4 digits of the card.
   @objc public internal(set) var last4: String
   /// For cards made with Apple Pay, this refers to the last 4 digits of the

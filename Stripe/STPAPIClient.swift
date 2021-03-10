@@ -198,26 +198,6 @@ public class STPAPIClient: NSObject {
   }
 }
 
-// MARK: Bank Accounts
-
-/// STPAPIClient extensions to create Stripe tokens from bank accounts.
-extension STPAPIClient {
-  /// Converts an STPBankAccount object into a Stripe token using the Stripe API.
-  /// - Parameters:
-  ///   - bankAccount: The user's bank account details. Cannot be nil. - seealso: https://stripe.com/docs/api#create_bank_account_token
-  ///   - completion:  The callback to run with the returned Stripe token (and any errors that may have occurred).
-  @objc
-  public func createToken(
-    withBankAccount bankAccount: STPBankAccountParams,
-    completion: @escaping STPTokenCompletionBlock
-  ) {
-    var params = STPFormEncoder.dictionary(forObject: bankAccount)
-    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
-    createToken(withParameters: params, completion: completion)
-    STPTelemetryClient.shared.sendTelemetryData()
-  }
-}
-
 // MARK: Personally Identifiable Information
 
 /// STPAPIClient extensions to create Stripe tokens from a personal identification number.
@@ -295,123 +275,6 @@ extension STPAPIClient {
       createToken(withParameters: params, completion: completion)
     }
     STPTelemetryClient.shared.sendTelemetryData()
-  }
-}
-
-// MARK: Sources
-
-/// STPAPIClient extensions for working with Source objects
-extension STPAPIClient {
-  /// Creates a Source object using the provided details.
-  /// Note: in order to create a source on a connected account, you can set your
-  /// API client's `stripeAccount` property to the ID of the account.
-  /// - seealso: https://stripe.com/docs/sources/connect#creating-direct-charges
-  /// - Parameters:
-  ///   - sourceParams: The details of the source to create. Cannot be nil. - seealso: https://stripe.com/docs/api#create_source
-  ///   - completion:   The callback to run with the returned Source object, or an error.
-  @objc(createSourceWithParams:completion:)
-  public func createSource(
-    with sourceParams: STPSourceParams, completion: @escaping STPSourceCompletionBlock
-  ) {
-    let sourceType = STPSource.string(from: sourceParams.type)
-    STPAnalyticsClient.sharedClient.logSourceCreationAttempt(
-      with: configuration,
-      sourceType: sourceType)
-    sourceParams.redirectMerchantName = configuration.companyName
-    var params = STPFormEncoder.dictionary(forObject: sourceParams)
-    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
-    APIRequest<STPSource>.post(
-      with: self,
-      endpoint: APIEndpointSources,
-      parameters: params
-    ) { object, _, error in
-      completion(object, error)
-    }
-    STPTelemetryClient.shared.sendTelemetryData()
-  }
-
-  /// Retrieves the Source object with the given ID. - seealso: https://stripe.com/docs/api#retrieve_source
-  /// - Parameters:
-  ///   - identifier:  The identifier of the source to be retrieved. Cannot be nil.
-  ///   - secret:      The client secret of the source. Cannot be nil.
-  ///   - completion:  The callback to run with the returned Source object, or an error.
-  @objc
-  public func retrieveSource(
-    withId identifier: String, clientSecret secret: String,
-    completion: @escaping STPSourceCompletionBlock
-  ) {
-    retrieveSource(
-      withId: identifier, clientSecret: secret,
-      responseCompletion: { object, _, error in
-        completion(object, error)
-      })
-  }
-
-  @discardableResult
-  func retrieveSource(
-    withId identifier: String,
-    clientSecret secret: String,
-    responseCompletion completion: @escaping (STPSource?, HTTPURLResponse?, Error?) -> Void
-  ) -> URLSessionDataTask {
-    let endpoint = "\(APIEndpointSources)/\(identifier)"
-    let parameters = [
-      "client_secret": secret
-    ]
-    return
-      (APIRequest<STPSource>.getWith(
-        self,
-        endpoint: endpoint,
-        parameters: parameters,
-        completion: completion))
-  }
-
-  /// Starts polling the Source object with the given ID. For payment methods that require
-  /// additional customer action (e.g. authorizing a payment with their bank), polling
-  /// allows you to determine if the action was successful. Polling will stop and the
-  /// provided callback will be called once the source's status is no longer `pending`,
-  /// or if the given timeout is reached and the source is still `pending`. If polling
-  /// stops due to an error, the callback will be fired with the latest retrieved
-  /// source and the error.
-  /// Note that if a poll is already running for a source, subsequent calls to `startPolling`
-  /// with the same source ID will do nothing.
-  /// - Parameters:
-  ///   - identifier:  The identifier of the source to be retrieved. Cannot be nil.
-  ///   - secret:      The client secret of the source. Cannot be nil.
-  ///   - timeout:     The timeout for the polling operation, in seconds. Timeouts are capped at 5 minutes.
-  ///   - completion:  The callback to run with the returned Source object, or an error.
-  @available(iOSApplicationExtension, unavailable)
-  @available(macCatalystApplicationExtension, unavailable)
-  @objc
-  public func startPollingSource(
-    withId identifier: String, clientSecret secret: String, timeout: TimeInterval,
-    completion: @escaping STPSourceCompletionBlock
-  ) {
-    stopPollingSource(withId: identifier)
-    let poller = STPSourcePoller(
-      apiClient: self,
-      clientSecret: secret,
-      sourceID: identifier,
-      timeout: timeout,
-      completion: completion)
-    sourcePollersQueue?.async(execute: {
-      self.sourcePollers?[identifier] = poller
-    })
-  }
-
-  /// Stops polling the Source object with the given ID. Note that the completion block passed to
-  /// `startPolling` will not be fired when `stopPolling` is called.
-  /// - Parameter identifier:  The identifier of the source to be retrieved. Cannot be nil.
-  @available(iOSApplicationExtension, unavailable)
-  @available(macCatalystApplicationExtension, unavailable)
-  @objc
-  public func stopPollingSource(withId identifier: String) {
-    sourcePollersQueue?.async(execute: {
-      let poller = self.sourcePollers?[identifier] as? STPSourcePoller
-      if let poller = poller {
-        poller.stopPolling()
-        self.sourcePollers?[identifier] = nil
-      }
-    })
   }
 }
 
@@ -509,7 +372,6 @@ extension STPAPIClient {
     let identifier = paymentIntentParams.stripeId ?? ""
     let type =
       paymentIntentParams.paymentMethodParams?.rawTypeString
-      ?? paymentIntentParams.sourceParams?.rawTypeString
     STPAnalyticsClient.sharedClient.logPaymentIntentConfirmationAttempt(
       with: configuration,
       paymentMethodType: type)

@@ -37,32 +37,16 @@
     applePayCard2[@"id"] = @"card_apple_pay2";
 
     NSDictionary *cardSource = [STPTestUtils jsonNamed:@"CardSource"];
-    NSDictionary *threeDSSource = [STPTestUtils jsonNamed:@"3DSSource"];
 
     NSMutableDictionary *customer = [[STPTestUtils jsonNamed:@"Customer"] mutableCopy];
     NSMutableDictionary *sources = [customer[@"sources"] mutableCopy];
-    sources[@"data"] = @[applePayCard1, card1, applePayCard2, card2, cardSource, threeDSSource];
+    sources[@"data"] = @[applePayCard1, card1, applePayCard2, card2, cardSource];
     customer[@"default_source"] = card1[@"id"];
     customer[@"sources"] = sources;
 
     STPCustomer *sut = [STPCustomer decodedObjectFromAPIResponse:customer];
     XCTAssertNotNil(sut);
     XCTAssertEqualObjects(sut.stripeID, customer[@"id"]);
-    XCTAssertTrue(sut.sources.count == 4);
-    XCTAssertEqualObjects(sut.sources[0].stripeID, card1[@"id"]);
-    XCTAssertEqualObjects(sut.sources[1].stripeID, card2[@"id"]);
-    XCTAssertEqualObjects(sut.defaultSource.stripeID, card1[@"id"]);
-    XCTAssertEqualObjects(sut.sources[2].stripeID, cardSource[@"id"]);
-    XCTAssertEqualObjects(sut.sources[3].stripeID, threeDSSource[@"id"]);
-
-    XCTAssertEqualObjects(sut.shippingAddress.name, customer[@"shipping"][@"name"]);
-    XCTAssertEqualObjects(sut.shippingAddress.phone, customer[@"shipping"][@"phone"]);
-    XCTAssertEqualObjects(sut.shippingAddress.city, customer[@"shipping"][@"address"][@"city"]);
-    XCTAssertEqualObjects(sut.shippingAddress.country, customer[@"shipping"][@"address"][@"country"]);
-    XCTAssertEqualObjects(sut.shippingAddress.line1, customer[@"shipping"][@"address"][@"line1"]);
-    XCTAssertEqualObjects(sut.shippingAddress.line2, customer[@"shipping"][@"address"][@"line2"]);
-    XCTAssertEqualObjects(sut.shippingAddress.postalCode, customer[@"shipping"][@"address"][@"postal_code"]);
-    XCTAssertEqualObjects(sut.shippingAddress.state, customer[@"shipping"][@"address"][@"state"]);
 }
 
 @end

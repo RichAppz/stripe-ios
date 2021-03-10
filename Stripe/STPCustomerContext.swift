@@ -74,7 +74,6 @@ open class STPCustomerContext: NSObject, STPBackendAPIAdapter {
     }
     set(includeApplePayMethods) {
       _includeApplePayPaymentMethods = includeApplePayMethods
-      customer?.updateSources(filteringApplePay: !includeApplePayMethods)
     }
   }
 
@@ -178,7 +177,6 @@ open class STPCustomerContext: NSObject, STPBackendAPIAdapter {
       }
       self.apiClient.retrieveCustomer(using: ephemeralKey) { customer, error in
         if let customer = customer {
-          customer.updateSources(filteringApplePay: !self.includeApplePayPaymentMethods)
           self.customer = customer
         }
         if let completion = completion {
@@ -212,7 +210,6 @@ open class STPCustomerContext: NSObject, STPBackendAPIAdapter {
         using: ephemeralKey
       ) { customer, error in
         if let customer = customer {
-          customer.updateSources(filteringApplePay: !self.includeApplePayPaymentMethods)
           self.customer = customer
         }
         if let completion = completion {

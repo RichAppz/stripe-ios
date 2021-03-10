@@ -47,11 +47,6 @@ public class STPPaymentIntentParams: NSObject {
   /// @note alternative to `paymentMethodParams`
   @objc public var paymentMethodId: String?
 
-  /// Provide a supported `STPSourceParams` object into here, and Stripe will create a Source
-  /// during PaymentIntent confirmation.
-  /// @note alternative to `sourceId`
-  @objc public var sourceParams: STPSourceParams?
-
   /// Provide an already created Source's id, and it will be used to confirm the PaymentIntent.
   /// @note alternative to `sourceParams`
   @objc public var sourceId: String?
@@ -142,7 +137,6 @@ public class STPPaymentIntentParams: NSObject {
       "useStripeSDK = \(String(describing: useStripeSDK?.boolValue))",
       // Source
       "sourceId = \(String(describing: sourceId))",
-      "sourceParams = \(String(describing: sourceParams))",
       // PaymentMethod
       "paymentMethodId = \(String(describing: paymentMethodId))",
       "paymentMethodParams = \(String(describing: paymentMethodParams))",
@@ -189,7 +183,6 @@ extension STPPaymentIntentParams: STPFormEncodable {
       NSStringFromSelector(#selector(getter:paymentMethodParams)): "payment_method_data",
       NSStringFromSelector(#selector(getter:paymentMethodId)): "payment_method",
       NSStringFromSelector(#selector(getter:setupFutureUsageRawString)): "setup_future_usage",
-      NSStringFromSelector(#selector(getter:sourceParams)): "source_data",
       NSStringFromSelector(#selector(getter:sourceId)): "source",
       NSStringFromSelector(#selector(getter:receiptEmail)): "receipt_email",
       NSStringFromSelector(#selector(getter:savePaymentMethod)): "save_payment_method",
@@ -211,7 +204,6 @@ extension STPPaymentIntentParams: NSCopying {
 
     copy.paymentMethodParams = paymentMethodParams
     copy.paymentMethodId = paymentMethodId
-    copy.sourceParams = sourceParams
     copy.sourceId = sourceId
     copy.receiptEmail = receiptEmail
     copy.savePaymentMethod = savePaymentMethod

@@ -237,7 +237,6 @@ public class STPRedirectContext: NSObject, SFSafariViewControllerDelegate, STPUR
   private var safariVC: SFSafariViewController?
   /// If we're on iOS 11+ and in the SafariVC flow, this tracks the latest URL loaded/redirected to during the initial load
   private var lastKnownSafariVCURL: URL?
-  private var source: STPSource?
   private var subscribedToURLNotifications = false
   private var subscribedToAppActiveNotifications = false
 
@@ -468,18 +467,6 @@ public class STPRedirectContext: NSObject, SFSafariViewControllerDelegate, STPUR
 
   func isSafariVCPresented() -> Bool {
     return safariVC != nil
-  }
-
-  class func nativeRedirectURL(for source: STPSource) -> URL? {
-    var nativeURLString: String?
-    switch source.type {
-    default:
-      // All other sources currently have no native url support
-      break
-    }
-
-    let nativeURL = nativeURLString != nil ? URL(string: nativeURLString ?? "") : nil
-    return nativeURL
   }
 }
 

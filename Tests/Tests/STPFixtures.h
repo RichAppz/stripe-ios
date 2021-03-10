@@ -46,11 +46,6 @@ extern NSString *const STPTestJSONSourceCard;
 + (PKPaymentRequest *)applePayRequest;
 
 /**
- A BankAccountParams object with all fields filled.
- */
-+ (STPBankAccountParams *)bankAccountParams;
-
-/**
  A CardParams object with a valid number, expMonth, expYear, and cvc.
  */
 + (STPCardParams *)cardParams;
@@ -59,11 +54,6 @@ extern NSString *const STPTestJSONSourceCard;
  A valid card object
  */
 + (STPCard *)card;
-
-/**
- A Source object with type card
- */
-+ (STPSource *)cardSource;
 
 /**
  A Token for a card

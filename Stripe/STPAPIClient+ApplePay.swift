@@ -24,25 +24,6 @@ extension STPAPIClient {
     STPTelemetryClient.shared.sendTelemetryData()
   }
 
-  /// Converts a PKPayment object into a Stripe source using the Stripe API.
-  /// - Parameters:
-  ///   - payment:     The user's encrypted payment information as returned from a PKPaymentAuthorizationController. Cannot be nil.
-  ///   - completion:  The callback to run with the returned Stripe source (and any errors that may have occurred).
-  @objc(createSourceWithPayment:completion:)
-  public func createSource(with payment: PKPayment, completion: @escaping STPSourceCompletionBlock)
-  {
-    createToken(with: payment) { token, error in
-      if token?.tokenId == nil || error != nil {
-        completion(nil, error ?? NSError.stp_genericConnectionError())
-      } else {
-        let params = STPSourceParams()
-        params.type = .card
-        params.token = token?.tokenId
-        self.createSource(with: params, completion: completion)
-      }
-    }
-  }
-
   /// Converts a PKPayment object into a Stripe Payment Method using the Stripe API.
   /// - Parameters:
   ///   - payment:     The user's encrypted payment information as returned from a PKPaymentAuthorizationController. Cannot be nil.
@@ -142,6 +123,4 @@ extension STPAPIClient {
 
     return payload
   }
-
-  // MARK: - Errors
 }

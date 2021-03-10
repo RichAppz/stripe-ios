@@ -16,12 +16,6 @@ public class STPCustomer: NSObject {
   /// The Stripe ID of the customer, e.g. `cus_1234`
   @objc public let stripeID: String
 
-  /// The default source used to charge the customer.
-  @objc public private(set) var defaultSource: STPSourceProtocol?
-
-  /// The available payment sources the customer has (this may be an empty array).
-  @objc public private(set) var sources: [STPSourceProtocol]
-
   /// The customer's shipping address.
   @objc public var shippingAddress: STPAddress?
 
@@ -35,28 +29,20 @@ public class STPCustomer: NSObject {
   /// - Returns: an instance of STPCustomer
   @objc
   public convenience init(
-    stripeID: String,
-    defaultSource: STPSourceProtocol?,
-    sources: [STPSourceProtocol]
+    stripeID: String
   ) {
     self.init(
       stripeID: stripeID,
-      defaultSource: defaultSource,
-      sources: sources,
       shippingAddress: nil,
       allResponseFields: [:])
   }
 
   internal init(
     stripeID: String,
-    defaultSource: STPSourceProtocol?,
-    sources: [STPSourceProtocol],
     shippingAddress: STPAddress?,
     allResponseFields: [AnyHashable: Any]
   ) {
     self.stripeID = stripeID
-    self.defaultSource = defaultSource
-    self.sources = sources
     self.shippingAddress = shippingAddress
     self.allResponseFields = allResponseFields
     super.init()
@@ -65,8 +51,6 @@ public class STPCustomer: NSObject {
   convenience override init() {
     self.init(
       stripeID: "",
-      defaultSource: nil,
-      sources: [],
       shippingAddress: nil,
       allResponseFields: [:])
   }
@@ -79,27 +63,9 @@ public class STPCustomer: NSObject {
       String(format: "%@: %p", NSStringFromClass(STPCustomer.self), self),
       // Identifier
       "stripeID = \(stripeID)",
-      // Sources
-      "defaultSource = \(String(describing: defaultSource))",
-      "sources = \(sources)",
     ]
 
     return "<\(props.joined(separator: "; "))>"
-  }
-
-  /**
-     Replaces the customer's `sources` and `defaultSource` based on whether or not
-     they should include Apple Pay sources. More details on documentation for
-     `STPCustomerContext includeApplePaySources`
-
-     @param filteringApplePay      If YES, Apple Pay sources will be ignored
-     */
-  @objc(updateSourcesFilteringApplePay:)
-  public func updateSources(filteringApplePay: Bool) {
-    let (defaultSource, sources) = STPCustomer.sources(
-      from: allResponseFields, filterApplePay: filteringApplePay)
-    self.defaultSource = defaultSource
-    self.sources = sources
   }
 }
 
@@ -124,65 +90,12 @@ extension STPCustomer: STPAPIResponseDecodable {
     } else {
       shippingAddress = nil
     }
-    let (defaultSource, sources) = STPCustomer.sources(from: dict, filterApplePay: true)
 
     return STPCustomer(
       stripeID: stripeID,
-      defaultSource: defaultSource,
-      sources: sources,
       shippingAddress: shippingAddress,
       allResponseFields: dict) as? Self
 
-  }
-
-  private class func sources(from response: [AnyHashable: Any], filterApplePay: Bool) -> (
-    default: STPSourceProtocol?, sources: [STPSourceProtocol]
-  ) {
-
-    guard let sourcesDict = response["sources"] as? [AnyHashable: Any],
-      let data = sourcesDict["data"] as? [[AnyHashable: Any]]
-    else {
-      return (nil, [])
-    }
-
-    var defaultSource: STPSourceProtocol?
-    let defaultSourceId = response["default_source"] as? String
-    var sources: [STPSourceProtocol] = []
-
-    for contents in data {
-      if let object = contents["object"] as? String {
-        if object == "card" {
-          if let card = STPCard.decodedObject(fromAPIResponse: contents),
-            !filterApplePay || !card.isApplePayCard
-          {
-
-            sources.append(card)
-
-            if let defaultSourceId = defaultSourceId,
-              card.stripeID == defaultSourceId
-            {
-              defaultSource = card
-            }
-          }
-        } else if object == "source" {
-          if let source = STPSource.decodedObject(fromAPIResponse: contents),
-            !filterApplePay || !(source.cardDetails?.isApplePayCard ?? false)
-          {
-            sources.append(source)
-
-            if let defaultSourceId = defaultSourceId,
-              source.stripeID == defaultSourceId
-            {
-              defaultSource = source
-            }
-          }
-        }
-      } else {
-        continue
-      }
-
-    }
-    return (defaultSource, sources)
   }
 }
 

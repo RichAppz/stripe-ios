@@ -38,17 +38,6 @@ NSString *const STPTestJSONSourceCard = @"CardSource";
     return address;
 }
 
-+ (STPBankAccountParams *)bankAccountParams {
-    STPBankAccountParams *bankParams = [STPBankAccountParams new];
-    // https://stripe.com/docs/testing#account-numbers
-    bankParams.accountNumber = @"000123456789";
-    bankParams.routingNumber = @"110000000";
-    bankParams.country = @"US";
-    bankParams.currency = @"usd";
-    bankParams.accountNumber = @"Jenny Rosen";
-    return bankParams;
-}
-
 + (STPCardParams *)cardParams {
     STPCardParams *cardParams = [STPCardParams new];
     cardParams.number = @"4242424242424242";
@@ -69,10 +58,6 @@ NSString *const STPTestJSONSourceCard = @"CardSource";
 
 + (STPCard *)card {
     return [STPCard decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:STPTestJSONCard]];
-}
-
-+ (STPSource *)cardSource {
-    return [STPSource decodedObjectFromAPIResponse:[STPTestUtils jsonNamed:STPTestJSONSourceCard]];
 }
 
 + (STPToken *)cardToken {

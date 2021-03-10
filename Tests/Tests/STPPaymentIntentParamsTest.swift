@@ -21,8 +21,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
       XCTAssertEqual(params.additionalAPIParameters.count, 0)
 
       XCTAssertNil(params.stripeId, "invalid secrets, no stripeId")
-      XCTAssertNil(params.sourceParams)
-      XCTAssertNil(params.sourceId)
       XCTAssertNil(params.receiptEmail)
       XCTAssertNil(params.savePaymentMethod)
       XCTAssertNil(params.returnURL)

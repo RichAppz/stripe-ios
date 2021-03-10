@@ -35,21 +35,9 @@
     NSDictionary *cardDict = [self buildTokenParams:card];
     XCTAssertEqualObjects([STPAnalyticsClient tokenTypeFromParameters:cardDict], @"card");
 
-    STPBankAccountParams *bank = [STPFixtures bankAccountParams];
-    NSDictionary *bankDict = [self buildTokenParams:bank];
-    XCTAssertEqualObjects([STPAnalyticsClient tokenTypeFromParameters:bankDict], @"bank_account");
-
     PKPayment *applePay = [STPFixtures applePayPayment];
     NSDictionary *applePayDict = [self addTelemetry:[STPAPIClient parametersForPayment:applePay]];
     XCTAssertEqualObjects([STPAnalyticsClient tokenTypeFromParameters:applePayDict], @"apple_pay");
-}
-
-#pragma mark - Tests various classes report usage
-
-- (void)testApplePayContextAddsUsage{
-    id delegate;
-    STPApplePayContext *_ = [[STPApplePayContext alloc] initWithPaymentRequest:[STPFixtures applePayRequest] delegate:delegate];
-    XCTAssertTrue([[STPAnalyticsClient sharedClient].productUsage containsObject:NSStringFromClass([_ class])]);
 }
 
 #pragma mark - Helpers

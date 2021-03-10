@@ -56,16 +56,6 @@ public typealias STPJSONResponseCompletionBlock = ([AnyHashable: Any]?, Error?) 
 ///   - token: The Stripe token from the response. Will be nil if an error occurs. - seealso: STPToken
 ///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
 public typealias STPTokenCompletionBlock = (STPToken?, Error?) -> Void
-/// A callback to be run with a source response from the Stripe API.
-/// - Parameters:
-///   - source: The Stripe source from the response. Will be nil if an error occurs. - seealso: STPSource
-///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
-public typealias STPSourceCompletionBlock = (STPSource?, Error?) -> Void
-/// A callback to be run with a source or card response from the Stripe API.
-/// - Parameters:
-///   - source: The Stripe source from the response. Will be nil if an error occurs. - seealso: STPSourceProtocol
-///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
-public typealias STPSourceProtocolCompletionBlock = (STPSourceProtocol?, Error?) -> Void
 /// A callback to be run with a PaymentIntent response from the Stripe API.
 /// - Parameters:
 ///   - paymentIntent: The Stripe PaymentIntent from the response. Will be nil if an error occurs. - seealso: STPPaymentIntent
@@ -119,12 +109,6 @@ public typealias STPCustomerCompletionBlock = (STPCustomer?, Error?) -> Void
   case unknownError
 }
 
-/// A callback to be run with a card PIN response from the Stripe API.
-/// - Parameters:
-///   - cardPin: The Stripe card PIN from the response. Will be nil if an error occurs. - seealso: STPIssuingCardPin
-///   - status: The status to help you sort between different error state, or STPPinSuccess when succesful. - seealso: STPPinStatus for possible values.
-///   - error: The error returned from the response, or nil if none occurs. - seealso: StripeError.h for possible values.
-public typealias STPPinCompletionBlock = (STPIssuingCardPin?, STPPinStatus, Error?) -> Void
 /// A block called with a payment status and an optional error.
 /// - Parameter error: The error that occurred, if any.
 public typealias STPPaymentStatusBlock = (STPPaymentStatus, Error?) -> Void
