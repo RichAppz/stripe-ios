@@ -198,10 +198,139 @@ public class STPAPIClient: NSObject {
   }
 }
 
+// MARK: Personally Identifiable Information
+
+/// STPAPIClient extensions to create Stripe tokens from a personal identification number.
+extension STPAPIClient {
+  /// Converts a personal identification number into a Stripe token using the Stripe API.
+  /// - Parameters:
+  ///   - pii: The user's personal identification number. Cannot be nil. - seealso: https://stripe.com/docs/api#create_pii_token
+  ///   - completion:  The callback to run with the returned Stripe token (and any errors that may have occurred).
+  @objc
+  public func createToken(
+    withPersonalIDNumber pii: String, completion: STPTokenCompletionBlock?
+  ) {
+    var params: [String: Any] = [
+      "pii": [
+        "personal_id_number": pii
+      ]
+    ]
+    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
+    if let completion = completion {
+      createToken(withParameters: params, completion: completion)
+    }
+    STPTelemetryClient.shared.sendTelemetryData()
+  }
+
+  /// Converts the last 4 SSN digits into a Stripe token using the Stripe API.
+  /// - Parameters:
+  ///   - ssnLast4: The last 4 digits of the user's SSN. Cannot be nil.
+  ///   - completion:  The callback to run with the returned Stripe token (and any errors that may have occurred).
+  @objc
+  public func createToken(
+    withSSNLast4 ssnLast4: String, completion: @escaping STPTokenCompletionBlock
+  ) {
+    var params: [String: Any] = [
+      "pii": [
+        "ssn_last_4": ssnLast4
+      ]
+    ]
+    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
+    createToken(withParameters: params, completion: completion)
+    STPTelemetryClient.shared.sendTelemetryData()
+  }
+}
+
+// MARK: Credit Cards
+
+/// STPAPIClient extensions to create Stripe tokens from credit or debit cards.
+extension STPAPIClient {
+  /// Converts an STPCardParams object into a Stripe token using the Stripe API.
+  /// - Parameters:
+  ///   - cardParams:  The user's card details. Cannot be nil. - seealso: https://stripe.com/docs/api#create_card_token
+  ///   - completion:  The callback to run with the returned Stripe token (and any errors that may have occurred).
+  @objc
+  public func createToken(
+    withCard cardParams: STPCardParams, completion: @escaping STPTokenCompletionBlock
+  ) {
+    var params = STPFormEncoder.dictionary(forObject: cardParams)
+    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
+    createToken(withParameters: params, completion: completion)
+    STPTelemetryClient.shared.sendTelemetryData()
+  }
+
+  /// Converts a CVC string into a Stripe token using the Stripe API.
+  /// - Parameters:
+  ///   - cvc:         The CVC/CVV number used to create the token. Cannot be nil.
+  ///   - completion:  The callback to run with the returned Stripe token (and any errors that may have occurred).
+  @objc
+  public func createToken(forCVCUpdate cvc: String, completion: STPTokenCompletionBlock? = nil) {
+    var params: [String: Any] = [
+      "cvc_update": [
+        "cvc": cvc
+      ]
+    ]
+    STPTelemetryClient.shared.addTelemetryFields(toParams: &params)
+    if let completion = completion {
+      createToken(withParameters: params, completion: completion)
+    }
+    STPTelemetryClient.shared.sendTelemetryData()
+  }
+}
+
 // MARK: Payment Intents
 
 /// STPAPIClient extensions for working with PaymentIntent objects.
 extension STPAPIClient {
+  /// Retrieves the PaymentIntent object using the given secret. - seealso: https://stripe.com/docs/api#retrieve_payment_intent
+  /// - Parameters:
+  ///   - secret:      The client secret of the payment intent to be retrieved. Cannot be nil.
+  ///   - completion:  The callback to run with the returned PaymentIntent object, or an error.
+  @objc
+  public func retrievePaymentIntent(
+    withClientSecret secret: String,
+    completion: @escaping STPPaymentIntentCompletionBlock
+  ) {
+    retrievePaymentIntent(
+      withClientSecret: secret,
+      expand: nil,
+      completion: completion)
+  }
+
+  /// Retrieves the PaymentIntent object using the given secret. - seealso: https://stripe.com/docs/api#retrieve_payment_intent
+  /// - Parameters:
+  ///   - secret:      The client secret of the payment intent to be retrieved. Cannot be nil.
+  ///   - expand:  An array of string keys to expand on the returned PaymentIntent object. These strings should match one or more of the parameter names that are marked as expandable. - seealso: https://stripe.com/docs/api/payment_intents/object
+  ///   - completion:  The callback to run with the returned PaymentIntent object, or an error.
+  @objc
+  public func retrievePaymentIntent(
+    withClientSecret secret: String,
+    expand: [String]?,
+    completion: @escaping STPPaymentIntentCompletionBlock
+  ) {
+    assert(
+      STPPaymentIntentParams.isClientSecretValid(secret),
+      "`secret` format does not match expected client secret formatting.")
+    let identifier = STPPaymentIntent.id(fromClientSecret: secret) ?? ""
+    let endpoint = "\(APIEndpointPaymentIntents)/\(identifier)"
+
+    var parameters: [String: Any] = [:]
+    parameters["client_secret"] = secret
+    if (expand?.count ?? 0) > 0 {
+      if let expand = expand {
+        parameters["expand"] = expand
+      }
+    }
+
+    APIRequest<STPPaymentIntent>.getWith(
+      self,
+      endpoint: endpoint,
+      parameters: parameters
+    ) { paymentIntent, _, error in
+      completion(paymentIntent, error)
+    }
+  }
+
   /// Confirms the PaymentIntent object with the provided params object.
   /// At a minimum, the params object must include the `clientSecret`.
   /// - seealso: https://stripe.com/docs/api#confirm_payment_intent
@@ -269,12 +398,55 @@ extension STPAPIClient {
     }
   }
 
+  /// Endpoint to call to indicate that the web-based challenge flow for 3DS authentication was canceled.
+  func cancel3DSAuthentication(
+    forPaymentIntent paymentIntentID: String,
+    withSource sourceID: String,
+    completion: @escaping STPPaymentIntentCompletionBlock
+  ) {
+    APIRequest<STPPaymentIntent>.post(
+      with: self,
+      endpoint: "\(APIEndpointPaymentIntents)/\(paymentIntentID)/source_cancel",
+      parameters: [
+        "source": sourceID
+      ]
+    ) { paymentIntent, _, responseError in
+      completion(paymentIntent, responseError)
+    }
+  }
 }
 
 // MARK: Setup Intents
 
 /// STPAPIClient extensions for working with SetupIntent objects.
 extension STPAPIClient {
+  /// Retrieves the SetupIntent object using the given secret. - seealso: https://stripe.com/docs/api/setup_intents/retrieve
+  /// - Parameters:
+  ///   - secret:      The client secret of the SetupIntent to be retrieved. Cannot be nil.
+  ///   - completion:  The callback to run with the returned SetupIntent object, or an error.
+  @objc
+  public func retrieveSetupIntent(
+    withClientSecret secret: String,
+    completion: @escaping STPSetupIntentCompletionBlock
+  ) {
+    assert(
+      STPSetupIntentConfirmParams.isClientSecretValid(secret),
+      "`secret` format does not match expected client secret formatting.")
+    let identifier = STPSetupIntent.id(fromClientSecret: secret) ?? ""
+
+    let endpoint = "\(APIEndpointSetupIntents)/\(identifier)"
+
+    APIRequest<STPSetupIntent>.getWith(
+      self,
+      endpoint: endpoint,
+      parameters: [
+        "client_secret": secret
+      ]
+    ) { setupIntent, _, error in
+      completion(setupIntent, error)
+    }
+  }
+
   /// Confirms the SetupIntent object with the provided params object.
   /// At a minimum, the params object must include the `clientSecret`.
   /// - seealso: https://stripe.com/docs/api/setup_intents/confirm
@@ -305,6 +477,22 @@ extension STPAPIClient {
       parameters: params
     ) { setupIntent, _, error in
       completion(setupIntent, error)
+    }
+  }
+
+  func cancel3DSAuthentication(
+    forSetupIntent setupIntentID: String,
+    withSource sourceID: String,
+    completion: @escaping STPSetupIntentCompletionBlock
+  ) {
+    APIRequest<STPSetupIntent>.post(
+      with: self,
+      endpoint: "\(APIEndpointSetupIntents)/\(setupIntentID)/source_cancel",
+      parameters: [
+        "source": sourceID
+      ]
+    ) { setupIntent, _, responseError in
+      completion(setupIntent, responseError)
     }
   }
 }
@@ -340,8 +528,12 @@ extension STPAPIClient {
 private let APIVersion = "2020-08-27"
 private let APIBaseURL = "https://api.stripe.com/v1"
 private let APIEndpointToken = "tokens"
+private let APIEndpointSources = "sources"
+private let APIEndpointCustomers = "customers"
+private let FileUploadURL = "https://uploads.stripe.com/v1/files"
 private let APIEndpointPaymentIntents = "payment_intents"
 private let APIEndpointSetupIntents = "setup_intents"
 private let APIEndpointPaymentMethods = "payment_methods"
+private let APIEndpoint3DS2 = "3ds2"
 private let APIEndpointFPXStatus = "fpx/bank_statuses"
 private let CardMetadataURL = "https://api.stripe.com/edge-internal/card-metadata"

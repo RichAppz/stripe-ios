@@ -18,6 +18,10 @@
 @property (nonatomic) id presentingViewController;
 @end
 
+@interface STPPaymentHandler (Test) <SFSafariViewControllerDelegate>
+- (BOOL)_canPresentWithAuthenticationContext:(id<STPAuthenticationContext>)authenticationContext error:(NSError **)error;
+@end
+
 @implementation STPPaymentHandlerFunctionalTest
 
 - (void)setUp {

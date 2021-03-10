@@ -40,6 +40,70 @@
     [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
 }
 
+- (void)testRetrievePreviousCreatedPaymentIntent {
+    STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:STPTestingDefaultPublishableKey];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Intent retrieve"];
+
+    [client retrievePaymentIntentWithClientSecret:@"pi_1GGCGfFY0qyl6XeWbSAsh2hn_secret_jbhwsI0DGWhKreJs3CCrluUGe"
+                                       completion:^(STPPaymentIntent *paymentIntent, NSError *error) {
+                                           XCTAssertNil(error);
+
+                                           XCTAssertNotNil(paymentIntent);
+                                           XCTAssertEqualObjects(paymentIntent.stripeId, @"pi_1GGCGfFY0qyl6XeWbSAsh2hn");
+                                           XCTAssertEqual(paymentIntent.amount, 100);
+                                           XCTAssertEqualObjects(paymentIntent.currency, @"usd");
+                                           XCTAssertFalse(paymentIntent.livemode);
+                                           XCTAssertNil(paymentIntent.sourceId);
+                                           XCTAssertNil(paymentIntent.paymentMethodId);
+                                           XCTAssertEqual(paymentIntent.status, STPPaymentIntentStatusCanceled);
+                                           XCTAssertNil(paymentIntent.nextAction);
+
+                                           [expectation fulfill];
+                                       }];
+
+    [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
+}
+
+- (void)testRetrieveWithWrongSecret {
+    STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:STPTestingDefaultPublishableKey];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Intent retrieve"];
+
+    [client retrievePaymentIntentWithClientSecret:@"pi_1GGCGfFY0qyl6XeWbSAsh2hn_secret_bad-secret"
+                                       completion:^(STPPaymentIntent *paymentIntent, NSError *error) {
+                                           XCTAssertNil(paymentIntent);
+
+                                           XCTAssertNotNil(error);
+                                           XCTAssertEqualObjects(error.domain, [STPError stripeDomain]);
+                                           XCTAssertEqual(error.code, STPInvalidRequestError);
+                                           XCTAssertEqualObjects(error.userInfo[[STPError errorParameterKey]],
+                                                                 @"clientSecret");
+
+                                           [expectation fulfill];
+                             }];
+
+    [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
+}
+
+- (void)testRetrieveMismatchedPublishableKey {
+    STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:@"pk_test_dCyfhfyeO2CZkcvT5xyIDdJj"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Intent retrieve"];
+
+    [client retrievePaymentIntentWithClientSecret:@"pi_1GGCGfFY0qyl6XeWbSAsh2hn_secret_jbhwsI0DGWhKreJs3CCrluUGe"
+                                       completion:^(STPPaymentIntent *paymentIntent, NSError *error) {
+                                           XCTAssertNil(paymentIntent);
+
+                                           XCTAssertNotNil(error);
+                                           XCTAssertEqualObjects(error.domain, [STPError stripeDomain]);
+                                           XCTAssertEqual(error.code, STPInvalidRequestError);
+                                           XCTAssertEqualObjects(error.userInfo[[STPError errorParameterKey]],
+                                                                 @"intent");
+
+                                           [expectation fulfill];
+                                       }];
+
+    [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
+}
+
 - (void)testConfirmCanceledPaymentIntentFails {
     STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:STPTestingDefaultPublishableKey];
     XCTestExpectation *expectation = [self expectationWithDescription:@"Payment Intent confirm"];

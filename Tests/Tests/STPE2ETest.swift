@@ -79,6 +79,7 @@ class STPE2ETest: XCTestCase {
         let backend = E2EBackend()
         let createPI = XCTestExpectation(description: "Create PaymentIntent")
         let fetchPIBackend = XCTestExpectation(description: "Fetch and check PaymentIntent via backend")
+        let fetchPIClient = XCTestExpectation(description: "Fetch and check PaymentIntent via client")
         let confirmPI = XCTestExpectation(description: "Confirm PaymentIntent")
 
         // Create a PaymentIntent
@@ -99,8 +100,19 @@ class STPE2ETest: XCTestCase {
                     XCTAssertEqual(expectationResult.currency, expected.currency)
                     fetchPIBackend.fulfill()
                 }
+                
+                // Check the PI information using the client
+                STPAPIClient.shared.retrievePaymentIntent(withClientSecret: pip.clientSecret) { (fetchedPI, fetchError) in
+                    XCTAssertNil(fetchError)
+                    let fetchedPI = fetchedPI!
+                    XCTAssertEqual(fetchedPI.status, .succeeded)
+                    XCTAssertEqual(fetchedPI.amount, expected.amount)
+                    XCTAssertEqual(fetchedPI.currency, expected.currency)
+                    // The client can't check the "on_behalf_of" field, so we check it via the merchant test above.
+                    fetchPIClient.fulfill()
+                }
             }
         }
-        wait(for: [createPI, confirmPI, fetchPIBackend], timeout: E2ETestTimeout)
+        wait(for: [createPI, confirmPI, fetchPIBackend, fetchPIClient], timeout: E2ETestTimeout)
     }
 }

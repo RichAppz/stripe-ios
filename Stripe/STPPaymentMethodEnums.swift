@@ -12,6 +12,8 @@ import Foundation
 @objc public enum STPPaymentMethodType: Int {
   /// A card payment method.
   case card
+  /// A card present payment method.
+  case cardPresent
   /// An unknown type.
   case unknown
 }

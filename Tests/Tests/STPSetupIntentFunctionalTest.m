@@ -30,6 +30,33 @@
     [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
 }
 
+- (void)testRetrieveSetupIntentSucceeds {
+    // Tests retrieving a previously created SetupIntent succeeds
+    NSString *setupIntentClientSecret = @"seti_1GGCuIFY0qyl6XeWVfbQK6b3_secret_GnoX2tzX2JpvxsrcykRSVna2lrYLKew";
+    STPAPIClient *client = [[STPAPIClient alloc] initWithPublishableKey:STPTestingDefaultPublishableKey];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Setup Intent retrieve"];
+    
+    [client retrieveSetupIntentWithClientSecret:setupIntentClientSecret
+                                     completion:^(STPSetupIntent *setupIntent, NSError *error) {
+                                         XCTAssertNil(error);
+                                         
+                                         XCTAssertNotNil(setupIntent);
+                                         XCTAssertEqualObjects(setupIntent.stripeID, @"seti_1GGCuIFY0qyl6XeWVfbQK6b3");
+                                         XCTAssertEqualObjects(setupIntent.clientSecret, setupIntentClientSecret);
+                                         XCTAssertEqualObjects(setupIntent.created, [NSDate dateWithTimeIntervalSince1970:1582673622]);
+                                         XCTAssertNil(setupIntent.customerID);
+                                         XCTAssertNil(setupIntent.stripeDescription);
+                                         XCTAssertFalse(setupIntent.livemode);
+                                         XCTAssertNil(setupIntent.nextAction);
+                                         XCTAssertNil(setupIntent.paymentMethodID);
+                                         XCTAssertEqualObjects(setupIntent.paymentMethodTypes, @[@(STPPaymentMethodTypeCard)]);
+                                         XCTAssertEqual(setupIntent.status, STPSetupIntentStatusRequiresPaymentMethod);
+                                         XCTAssertEqual(setupIntent.usage, STPSetupIntentUsageOffSession);
+                                         [expectation fulfill];
+                                     }];
+    [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
+}
+
 - (void)testConfirmSetupIntentSucceeds {
 
     __block NSString *clientSecret = nil;
