@@ -18,8 +18,6 @@ public class STPPaymentMethodCard: NSObject, STPAPIResponseDecodable {
 
   /// The issuer of the card.
   @objc public private(set) var brand: STPCardBrand = .unknown
-  /// Checks on Card address and CVC if provided.
-  @objc public private(set) var checks: STPPaymentMethodCardChecks?
   /// Two-letter ISO code representing the country of the card.
   @objc public private(set) var country: String?
   /// Two-digit number representing the card’s expiration month.
@@ -50,7 +48,6 @@ public class STPPaymentMethodCard: NSObject, STPAPIResponseDecodable {
       // Object
       String(format: "%@: %p", NSStringFromClass(STPPaymentMethodCard.self), self),
       "brand = \(STPCardBrandUtilities.stringFrom(brand) ?? "")",
-      "checks = \(checks?.description ?? "")",
       "country = \(country ?? "")",
       String(format: "expMonth = %lu", UInt(expMonth)),
       String(format: "expYear = %lu", UInt(expYear)),
@@ -76,8 +73,6 @@ public class STPPaymentMethodCard: NSObject, STPAPIResponseDecodable {
       return nil
     }
     card.brand = self.brand(from: nsDict.stp_string(forKey: "brand") ?? "")
-    card.checks = STPPaymentMethodCardChecks.decodedObject(
-      fromAPIResponse: nsDict.stp_dictionary(forKey: "checks"))
     card.country = nsDict.stp_string(forKey: "country")
     card.expMonth = nsDict.stp_int(forKey: "exp_month", or: 0)
     card.expYear = nsDict.stp_int(forKey: "exp_year", or: 0)
