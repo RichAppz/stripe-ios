@@ -212,34 +212,6 @@
     
     address.city = @"New York";
     
-    // For US fail if missing state or zip
-    XCTAssertFalse([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    address.state = @"NY";
-    XCTAssertFalse([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    address.postalCode = @"ABCDE";
-    XCTAssertFalse([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    //postal must be numeric for US
-    address.postalCode = @"10002";
-    XCTAssertTrue([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    address.phone = @"8885551212";
-    address.email = @"foo@example.com";
-    address.name = @"John Doe";
-    // Name/phone/email should have no effect
-    XCTAssertTrue([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    
-    // Non US countries don't require state
-    address.country = @"UK";
-    XCTAssertTrue([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    address.state = nil;
-    XCTAssertTrue([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    // alphanumeric postal ok in some countries
-    address.postalCode = @"ABCDE";
-    XCTAssertTrue([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    // UK requires ZIP
-    address.postalCode = nil;
-    XCTAssertFalse([address containsRequiredFields:STPBillingAddressFieldsFull]);
-    
-    
     address.country = @"IE"; // Doesn't require postal or state, but allows them
     XCTAssertTrue([address containsRequiredFields:STPBillingAddressFieldsFull]);
     address.postalCode = @"ABCDE";

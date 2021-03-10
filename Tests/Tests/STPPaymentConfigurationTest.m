@@ -108,7 +108,6 @@
     STPPaymentConfiguration *paymentConfigurationB = [paymentConfigurationA copy];
     XCTAssertNotEqual(paymentConfigurationA, paymentConfigurationB);
     XCTAssertTrue(paymentConfigurationB.applePayEnabled);
-    XCTAssertEqualObjects(paymentConfigurationB.requiredShippingAddressFields, allFields);
     XCTAssertFalse(paymentConfigurationB.verifyPrefilledShippingAddress);
     XCTAssertEqual(paymentConfigurationB.shippingType, STPShippingTypeDelivery);
     XCTAssertEqualObjects(paymentConfigurationB.companyName, @"companyName");
