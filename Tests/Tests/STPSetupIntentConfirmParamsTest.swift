@@ -21,7 +21,6 @@ class STPSetupIntentConfirmParamsTest: XCTestCase {
       XCTAssertNil(params.paymentMethodID)
       XCTAssertNil(params.returnURL)
       XCTAssertNil(params.useStripeSDK)
-      XCTAssertNil(params.mandateData)
     }
   }
 
@@ -32,15 +31,8 @@ class STPSetupIntentConfirmParamsTest: XCTestCase {
 
   func testDefaultMandateData() {
     let params = STPSetupIntentConfirmParams()
-
-    // no configuration should have no mandateData
-    XCTAssertNil(params.mandateData)
-
     params.paymentMethodParams = STPPaymentMethodParams()
-
     params.paymentMethodParams?.rawTypeString = "card"
-    // card type should have no default mandateData
-    XCTAssertNil(params.mandateData)
   }
 
   // MARK: STPFormEncodable Tests
@@ -71,8 +63,6 @@ class STPSetupIntentConfirmParamsTest: XCTestCase {
     params.paymentMethodID = "test_payment_method_id"
     params.returnURL = "fake://testing_only"
     params.useStripeSDK = NSNumber(value: true)
-    params.mandateData = STPMandateDataParams(
-      customerAcceptance: STPMandateCustomerAcceptanceParams(type: .offline, onlineParams: nil)!)
     params.additionalAPIParameters = [
       "other_param": "other_value"
     ]
@@ -83,7 +73,6 @@ class STPSetupIntentConfirmParamsTest: XCTestCase {
 
     // assert equal, not equal objects, because this is a shallow copy
     XCTAssertEqual(params.paymentMethodParams, paramsCopy.paymentMethodParams)
-    XCTAssertEqual(params.mandateData, paramsCopy.mandateData)
 
     XCTAssertEqual(params.returnURL, paramsCopy.returnURL)
     XCTAssertEqual(params.useStripeSDK, paramsCopy.useStripeSDK)

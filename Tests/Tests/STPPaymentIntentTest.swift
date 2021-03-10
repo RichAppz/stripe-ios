@@ -87,7 +87,6 @@ class STPPaymentIntentTest: XCTestCase {
       ))
     XCTAssertEqual(paymentIntent.sourceId, "src_1Cl1AdIl4IdHmuTbseiDWq6m")
     XCTAssertEqual(paymentIntent.status, .requiresAction)
-    XCTAssertEqual(paymentIntent.setupFutureUsage, .none)
 
     XCTAssertEqual(
       paymentIntent.paymentMethodTypes, [NSNumber(value: STPPaymentMethodType.card.rawValue)])

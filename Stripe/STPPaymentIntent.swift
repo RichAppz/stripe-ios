@@ -111,10 +111,6 @@ public class STPPaymentIntent: NSObject {
   /// The list of payment method types (e.g. `[NSNumber(value: STPPaymentMethodType.card.rawValue)]`) that this PaymentIntent is allowed to use.
   @objc public let paymentMethodTypes: [NSNumber]
 
-  /// When provided, this property indicates how you intend to use the payment method that your customer provides after the current payment completes. If applicable, additional authentication may be performed to comply with regional legislation or network rules required to enable the usage of the same payment method for additional payments.
-  /// Use on_session if you intend to only reuse the payment method when the customer is in your checkout flow. Use off_session if your customer may or may not be in your checkout flow.
-  @objc public let setupFutureUsage: STPPaymentIntentSetupFutureUsage
-
   /// The payment error encountered in the previous PaymentIntent confirmation.
   @objc public let lastPaymentError: STPPaymentIntentLastPaymentError?
 
@@ -146,7 +142,6 @@ public class STPPaymentIntent: NSObject {
       "paymentMethod = \(String(describing: paymentMethod))",
       "paymentMethodTypes = \(String(describing: allResponseFields["payment_method_types"] as? [String]))",
       "receiptEmail = \(String(describing: receiptEmail))",
-      "setupFutureUsage = \(String(describing: allResponseFields["setup_future_usage"] as? String))",
       "sourceId = \(String(describing: sourceId))",
       "status = \(String(describing: allResponseFields["status"] as? String))",
     ]
@@ -170,7 +165,6 @@ public class STPPaymentIntent: NSObject {
     paymentMethodId: String?,
     paymentMethodTypes: [NSNumber],
     receiptEmail: String?,
-    setupFutureUsage: STPPaymentIntentSetupFutureUsage,
     sourceId: String?,
     status: STPPaymentIntentStatus,
     stripeDescription: String?,
@@ -191,7 +185,6 @@ public class STPPaymentIntent: NSObject {
     self.paymentMethodId = paymentMethodId
     self.paymentMethodTypes = paymentMethodTypes
     self.receiptEmail = receiptEmail
-    self.setupFutureUsage = setupFutureUsage
     self.sourceId = sourceId
     self.status = status
     self.stripeDescription = stripeDescription
@@ -220,7 +213,6 @@ extension STPPaymentIntent: STPAPIResponseDecodable {
 
     let paymentMethod = STPPaymentMethod.decodedObject(
       fromAPIResponse: dict["payment_method"] as? [AnyHashable: Any])
-    let setupFutureUsageString = dict["setup_future_usage"] as? String
     let canceledAtUnixTime = dict["canceled_at"] as? TimeInterval
     return STPPaymentIntent(
       allResponseFields: dict,
@@ -243,8 +235,6 @@ extension STPPaymentIntent: STPAPIResponseDecodable {
       paymentMethodId: paymentMethod?.stripeId ?? dict["payment_method"] as? String,
       paymentMethodTypes: STPPaymentMethod.types(from: paymentMethodTypeStrings),
       receiptEmail: dict["receipt_email"] as? String,
-      setupFutureUsage: setupFutureUsageString != nil
-        ? STPPaymentIntentSetupFutureUsage(string: setupFutureUsageString!) : .none,
       sourceId: dict["source"] as? String,
       status: STPPaymentIntentStatus.status(from: rawStatus),
       stripeDescription: dict["description"] as? String,

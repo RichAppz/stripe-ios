@@ -24,9 +24,7 @@ class STPPaymentIntentParamsTest: XCTestCase {
       XCTAssertNil(params.receiptEmail)
       XCTAssertNil(params.savePaymentMethod)
       XCTAssertNil(params.returnURL)
-      XCTAssertNil(params.setupFutureUsage)
       XCTAssertNil(params.useStripeSDK)
-      XCTAssertNil(params.mandateData)
     }
   }
 
@@ -63,10 +61,7 @@ class STPPaymentIntentParamsTest: XCTestCase {
     params.paymentMethodId = "test_payment_method_id"
     params.savePaymentMethod = NSNumber(value: true)
     params.returnURL = "fake://testing_only"
-    params.setupFutureUsage = STPPaymentIntentSetupFutureUsage(rawValue: Int(truncating: NSNumber(value: 1)))
     params.useStripeSDK = NSNumber(value: true)
-    params.mandateData = STPMandateDataParams(
-      customerAcceptance: STPMandateCustomerAcceptanceParams(type: .offline, onlineParams: nil)!)
     params.additionalAPIParameters = [
       "other_param": "other_value"
     ]
@@ -77,9 +72,6 @@ class STPPaymentIntentParamsTest: XCTestCase {
 
     // assert equal, not equal objects, because this is a shallow copy
     XCTAssertEqual(params.paymentMethodParams, paramsCopy.paymentMethodParams)
-    XCTAssertEqual(params.mandateData, paramsCopy.mandateData)
-
-    XCTAssertEqual(params.setupFutureUsage, STPPaymentIntentSetupFutureUsage.none)
     XCTAssertEqual(params.savePaymentMethod, paramsCopy.savePaymentMethod)
     XCTAssertEqual(params.returnURL, paramsCopy.returnURL)
     XCTAssertEqual(params.useStripeSDK, paramsCopy.useStripeSDK)

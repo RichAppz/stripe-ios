@@ -64,44 +64,11 @@ public class STPPaymentIntentParams: NSObject {
   /// This should probably be a URL that opens your iOS app.
   @objc public var returnURL: String?
 
-  /// When provided, this property indicates how you intend to use the payment method that your customer provides after the current payment completes.
-  /// If applicable, additional authentication may be performed to comply with regional legislation or network rules required to enable the usage of the same payment method for additional payments.
-  public var setupFutureUsage: STPPaymentIntentSetupFutureUsage?
-  
-  /// When provided, this property indicates how you intend to use the payment method that your customer provides after the current payment completes.
-  /// If applicable, additional authentication may be performed to comply with regional legislation or network rules required to enable the usage of the same payment method for additional payments.
-  /// This property should only be used in Objective-C. In Swift, use `setupFutureUsage`.
-  /// - seealso: STPPaymentIntentSetupFutureUsage for more details on what values you can provide.
-  @available(swift, obsoleted: 1.0, renamed: "setupFutureUsage")
-  @objc(setupFutureUsage) public var setupFutureUsage_objc: NSNumber? {
-    get {
-      setupFutureUsage?.rawValue as NSNumber?
-    }
-    set {
-      setupFutureUsage = newValue.map { STPPaymentIntentSetupFutureUsage(rawValue: Int(truncating: $0)) } as? STPPaymentIntentSetupFutureUsage
-    }
-  }
-
   /// A boolean number to indicate whether you intend to use the Stripe SDK's functionality to handle any PaymentIntent next actions.
   /// If set to false, STPPaymentIntent.nextAction will only ever contain a redirect url that can be opened in a webview or mobile browser.
   /// When set to true, the nextAction may contain information that the Stripe SDK can use to perform native authentication within your
   /// app.
   @objc public var useStripeSDK: NSNumber?
-
-  internal var _mandateData: STPMandateDataParams?
-  /// Details about the Mandate to create.
-  /// @note If this value is null and the (self.paymentMethod.type == STPPaymentMethodTypeSEPADebit | | self.paymentMethodParams.type == STPPaymentMethodTypeAUBECSDebit || self.paymentMethodParams.type == STPPaymentMethodTypeBacsDebit) && self.mandate == nil`, the SDK will set this to an internal value indicating that the mandate data should be inferred from the current context.
-@objc public var mandateData: STPMandateDataParams? {
-    set {
-      _mandateData = newValue
-    }
-    get {
-      if let _mandateData = _mandateData {
-        return _mandateData
-      }
-      return nil
-    }
-  }
 
   /// :nodoc:
   @objc public var additionalAPIParameters: [AnyHashable: Any] = [:]
@@ -129,15 +96,12 @@ public class STPPaymentIntentParams: NSObject {
       "receiptEmail = \(String(describing: receiptEmail))",
       "returnURL = \(String(describing: returnURL))",
       "savePaymentMethod = \(String(describing: savePaymentMethod?.boolValue))",
-      "setupFutureUsage = \(String(describing: setupFutureUsage))",
       "useStripeSDK = \(String(describing: useStripeSDK?.boolValue))",
       // Source
       "sourceId = \(String(describing: sourceId))",
       // PaymentMethod
       "paymentMethodId = \(String(describing: paymentMethodId))",
       "paymentMethodParams = \(String(describing: paymentMethodParams))",
-      // Mandate
-      "mandateData = \(String(describing: mandateData))",
       // Additional params set by app
       "additionalAPIParameters = \(additionalAPIParameters)",
     ]
@@ -161,10 +125,6 @@ public class STPPaymentIntentParams: NSObject {
 // MARK: - STPFormEncodable
 extension STPPaymentIntentParams: STPFormEncodable {
 
-  @objc internal var setupFutureUsageRawString: String? {
-    return setupFutureUsage?.stringValue
-  }
-
   @objc
   public class func rootObjectName() -> String? {
     return nil
@@ -176,13 +136,11 @@ extension STPPaymentIntentParams: STPFormEncodable {
       NSStringFromSelector(#selector(getter:clientSecret)): "client_secret",
       NSStringFromSelector(#selector(getter:paymentMethodParams)): "payment_method_data",
       NSStringFromSelector(#selector(getter:paymentMethodId)): "payment_method",
-      NSStringFromSelector(#selector(getter:setupFutureUsageRawString)): "setup_future_usage",
       NSStringFromSelector(#selector(getter:sourceId)): "source",
       NSStringFromSelector(#selector(getter:receiptEmail)): "receipt_email",
       NSStringFromSelector(#selector(getter:savePaymentMethod)): "save_payment_method",
       NSStringFromSelector(#selector(getter:returnURL)): "return_url",
       NSStringFromSelector(#selector(getter:useStripeSDK)): "use_stripe_sdk",
-      NSStringFromSelector(#selector(getter:mandateData)): "mandate_data",
     ]
   }
 }
@@ -201,9 +159,7 @@ extension STPPaymentIntentParams: NSCopying {
     copy.receiptEmail = receiptEmail
     copy.savePaymentMethod = savePaymentMethod
     copy.returnURL = returnURL
-    copy.setupFutureUsage = setupFutureUsage
     copy.useStripeSDK = useStripeSDK
-    copy.mandateData = mandateData
     copy.additionalAPIParameters = additionalAPIParameters
 
     return copy

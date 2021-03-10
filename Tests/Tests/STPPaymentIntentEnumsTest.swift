@@ -116,27 +116,4 @@ class STPPaymentIntentEnumsTest: XCTestCase {
       STPPaymentIntentConfirmationMethod.confirmationMethod(from: "GARBAGE"),
       .unknown)
   }
-
-  func testSetupFutureUsageFromString() {
-    XCTAssertEqual(
-      STPPaymentIntentSetupFutureUsage(string: "on_session"),
-      .onSession)
-    XCTAssertEqual(
-      STPPaymentIntentSetupFutureUsage(string: "ON_SESSION"),
-      .onSession)
-
-    XCTAssertEqual(
-      STPPaymentIntentSetupFutureUsage(string: "off_session"),
-      .offSession)
-    XCTAssertEqual(
-      STPPaymentIntentSetupFutureUsage(string: "OFF_SESSION"),
-      .offSession)
-
-    XCTAssertEqual(
-      STPPaymentIntentSetupFutureUsage(string: "garbage"),
-      .unknown)
-    XCTAssertEqual(
-      STPPaymentIntentSetupFutureUsage(string: "GARBAGE"),
-      .unknown)
-  }
 }

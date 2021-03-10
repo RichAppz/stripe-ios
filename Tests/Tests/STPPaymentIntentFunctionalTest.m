@@ -56,7 +56,6 @@
                                            XCTAssertNil(paymentIntent.sourceId);
                                            XCTAssertNil(paymentIntent.paymentMethodId);
                                            XCTAssertEqual(paymentIntent.status, STPPaymentIntentStatusCanceled);
-                                           XCTAssertEqual(paymentIntent.setupFutureUsage, STPPaymentIntentSetupFutureUsageNone);
                                            XCTAssertNil(paymentIntent.nextAction);
 
                                            [expectation fulfill];
@@ -253,14 +252,6 @@
                                 }];
     
     [self waitForExpectationsWithTimeout:STPTestingNetworkRequestTimeout handler:nil];
-}
-
-#pragma mark - Test Objective-C setupFutureUsage
-
-- (void)testObjectiveCSetupFutureUsage {
-  STPPaymentIntentParams *params = [[STPPaymentIntentParams alloc] init];
-  params.setupFutureUsage = @(STPPaymentIntentSetupFutureUsageOnSession);
-  XCTAssertEqualObjects(params.setupFutureUsageRawString, @"on_session");
 }
 
 @end
